@@ -35,7 +35,7 @@ const papers = ["ကြေးမုံ", "မြန်မာ့အလင်း",
 const stories = ["Latest", "Popular", "E-Books", "Journals", "Tech", "Army"];
 
 function Cover({ i, title, className = "" }: { i: number; title: string; className?: string }) {
-  const h = hues[i % hues.length];
+  const h = hues[i % hues.length] ?? 182;
   return (
     <div
       className={`relative flex items-end overflow-hidden rounded-lg p-2 ${className}`}
@@ -135,7 +135,7 @@ function Index() {
             <div key={s} className="relative h-40 w-24 shrink-0">
               <Cover i={i + 2} title="" className="h-full w-full" />
               <div className="absolute left-2 top-2 grid h-8 w-8 place-items-center rounded-full border-2 border-primary bg-card text-primary">
-                {[Clock, Flame, BookMarked, Newspaper, Cpu, Shield][i] && (() => { const I = [Clock, Flame, BookMarked, Newspaper, Cpu, Shield][i]; return <I className="h-4 w-4" />; })()}
+                {(() => { const I = [Clock, Flame, BookMarked, Newspaper, Cpu, Shield][i] ?? Clock; return <I className="h-4 w-4" />; })()}
               </div>
               <span className="absolute bottom-2 left-2 text-xs font-bold text-primary-foreground drop-shadow">{s}</span>
             </div>
