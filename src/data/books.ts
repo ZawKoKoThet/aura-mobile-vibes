@@ -19,7 +19,7 @@ export const libraryBooks: BookItem[] = [
     "category": "ရသစာပေ",
     "year": "1970",
     "shelf": "B-3",
-    "cover": "/covers/070_နိုင်ဝင်းဆွေ_နွေတစ်ည.jpg",
+    "cover": "/covers/cover_naing_win_swe.jpg",
     "rating": 4.9,
     "copies": 2,
     "desc": "စာရေးဆရာ နိုင်ဝင်းဆွေ ၏ ထင်ရှားသော ရသဝတ္ထုရှည်"
@@ -31,7 +31,7 @@ export const libraryBooks: BookItem[] = [
     "category": "ဘာသာပြန်",
     "year": "1985",
     "shelf": "B-1",
-    "cover": "/covers/10402_တက္ကသိုလ်ဘုန်းနိုင်_ရှားလော့ဒေဝီ_ဘာသာပြန်ကဗျာများ.jpg",
+    "cover": "/covers/cover_charlotte_devi.jpg",
     "rating": 4.8,
     "copies": 1,
     "desc": "တက္ကသိုလ်ဘုန်းနိုင်၏ လက်ရာမွန် ဘာသာပြန်ကဗျာများ"
@@ -43,7 +43,7 @@ export const libraryBooks: BookItem[] = [
     "category": "ရသစာပေ",
     "year": "1988",
     "shelf": "B-1",
-    "cover": "/covers/10418_တက္ကသိုလ်ဘုန်းနိုင်_တိမ်ညိုအလွင့်လအမြင့်_၂.jpg",
+    "cover": "/covers/cover_teim_nyo.jpg",
     "rating": 4.9,
     "copies": 2,
     "desc": "နာမည်ကျော် ဝတ္ထုရှည် တွဲ(၂)"
@@ -55,7 +55,7 @@ export const libraryBooks: BookItem[] = [
     "category": "အတွေးအခေါ်/စေ့ဆော်မှု",
     "year": "2020",
     "shelf": "C-2",
-    "cover": "/covers/IKIGAIအိကီဂိုင်_1.jpg",
+    "cover": "/covers/cover_ikigai.jpg",
     "rating": 4.9,
     "copies": 3,
     "desc": "ဂျပန်လူမျိုးတို့၏ အသက်ရှည်ကျန်းမာ ပျော်ရွှင်စွာ နေထိုင်နည်း လျှို့ဝှက်ချက်"
@@ -67,7 +67,7 @@ export const libraryBooks: BookItem[] = [
     "category": "သမိုင်း/နိုင်ငံရေး",
     "year": "1965",
     "shelf": "A-2",
-    "cover": "/covers/သူ့ကျွန်မခံပြီ.jpg",
+    "cover": "/covers/cover_thu_kyun_ma_khan_pyi.jpg",
     "rating": 5.0,
     "copies": 1,
     "desc": "မြန်မာ့သမိုင်းနှင့် မျိုးချစ်စိတ်ဓာတ်ရှင်သန်ရေး ဂန္တဝင်စာအုပ်ကြီး"
@@ -79,7 +79,7 @@ export const libraryBooks: BookItem[] = [
     "category": "ရသစာပေ",
     "year": "2016",
     "shelf": "B-4",
-    "cover": "/covers/တောင်တန်းတွေရဲ့အလွန်_ပုညခင်.jpg",
+    "cover": "/covers/cover_taung_tan_dway.jpg",
     "rating": 4.8,
     "copies": 2,
     "desc": "ပုညခင် ရေးသားသော လူကြိုက်များ ရသဝတ္ထု"
@@ -91,7 +91,7 @@ export const libraryBooks: BookItem[] = [
     "category": "ဟာသ/ရသ",
     "year": "1995",
     "shelf": "B-2",
-    "cover": "/covers/မင်းလူ__ခိုးခိုးခစ်ခစ်.jpg",
+    "cover": "/covers/cover_min_lu_khoe.jpg",
     "rating": 4.7,
     "copies": 2,
     "desc": "စာရေးဆရာ မင်းလူ ၏ ဘဝအမြင် ဟာသဝတ္ထုတိုများ စုစည်းမှု"
@@ -103,7 +103,7 @@ export const libraryBooks: BookItem[] = [
     "category": "နည်းပညာ",
     "year": "2017",
     "shelf": "E-4",
-    "cover": "/covers/10161_Bhadeshia,_Harshad_Honeycombe,_Robert_Steels_Microstructure.jpg",
+    "cover": "/covers/cover_steels_microstructure.jpg",
     "rating": 4.7,
     "copies": 2,
     "desc": "သတ္တုဗေဒနှင့် အင်ဂျင်နီယာဆိုင်ရာ အဆင့်မြင့် စာအုပ်"
@@ -115,7 +115,7 @@ export const libraryBooks: BookItem[] = [
     "category": "နည်းပညာ",
     "year": "2015",
     "shelf": "E-2",
-    "cover": "/covers/11056_R_K_Rajput_A_Textbook_of_Manufacturing_Technology_Laxmi_Publications.jpg",
+    "cover": "/covers/cover_manufacturing_tech.jpg",
     "rating": 4.6,
     "copies": 3,
     "desc": "စက်မှုနည်းပညာနှင့် ထုတ်လုပ်မှုအင်ဂျင်နီယာ သင်ရိုးစာအုပ်"
@@ -127,7 +127,7 @@ export const libraryBooks: BookItem[] = [
     "category": "ပညာရေး",
     "year": "2023",
     "shelf": "D-1",
-    "cover": "/covers/13566._Grade_11_Physics_စနစ်သစ်_Textbook.jpg",
+    "cover": "/covers/cover_grade11_physics.jpg",
     "rating": 4.8,
     "copies": 5,
     "desc": "အထက်တန်းအဆင့် စနစ်သစ် ရူပဗေဒ ပြဋ္ဌာန်းစာအုပ်"
