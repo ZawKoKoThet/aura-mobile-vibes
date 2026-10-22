@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="my" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCDI Digital Library — စာကြည့်တိုက် စီမံခန့်ခွဲမှုစနစ်</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans Myanmar"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', 'Noto Sans Myanmar', sans-serif; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200 pb-20 lg:pb-10">
+
+  <!-- TOP NAVBAR -->
+  <header class="sticky top-0 z-30 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="setTab('home')">
+        <div class="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center shadow-md font-bold text-lg">
+          📚
+        </div>
+        <div>
+          <h1 class="text-lg font-black tracking-tight text-brand-600 dark:text-brand-400">OCDI Library</h1>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">စာကြည့်တိုက် စီမံခန့်ခွဲမှုစနစ် · Books, Journals & E-Resources</p>
+        </div>
+      </div>
+
+      <!-- Desktop Search -->
+      <div class="hidden md:flex flex-1 max-w-md items-center gap-2 rounded-full border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 px-4 py-2 focus-within:ring-2 focus-within:ring-brand-500">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+        <input id="desktopSearch" type="text" placeholder="စာအုပ်အမည်၊ စာရေးဆရာ၊ စင်နံပါတ် ရှာဖွေပါ..." 
+          class="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
+          oninput="onSearchInput(this.value)">
+      </div>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden lg:flex items-center gap-1.5">
+        <button onclick="setTab('home')" id="btnNavHome" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-brand-600 text-white shadow-sm">ပင်မ</button>
+        <button onclick="setTab('books')" id="btnNavBooks" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800">စာအုပ်များ</button>
+        <button onclick="setTab('pubs')" id="btnNavPubs" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800">သတင်းစာ</button>
+        <button onclick="setTab('donate')" id="btnNavDonate" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800">လှူဒါန်းရန်</button>
+      </nav>
+
+      <!-- Theme Switcher -->
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:scale-105 active:scale-95 transition">
+          <span id="themeIcon">☀️</span>
+        </button>
+        <div class="w-9 h-9 rounded-full bg-brand-500/20 text-brand-600 dark:text-brand-400 font-bold text-xs flex items-center justify-center">
+          OC
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Search Bar -->
+    <div class="md:hidden px-4 pb-2.5 pt-1">
+      <div class="flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 px-3.5 py-1.5">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+        <input id="mobileSearch" type="text" placeholder="စာအုပ်၊ စာရေးဆရာ ရှာရန်..." 
+          class="w-full bg-transparent text-xs outline-none placeholder:text-slate-400"
+          oninput="onSearchInput(this.value)">
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
+    <div class="flex flex-col lg:flex-row gap-6">
+      
+      <!-- DESKTOP LEFT SIDEBAR -->
+      <aside class="hidden lg:block w-64 shrink-0 space-y-4">
+        <!-- Library Stats Box -->
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3 shadow-sm">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">စာကြည့်တိုက် အချက်အလက်</h3>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="rounded-xl bg-slate-100 dark:bg-slate-800/60 p-2.5 text-center">
+              <div id="sidebarTotalBooks" class="text-lg font-black text-brand-600 dark:text-brand-400">143+</div>
+              <div class="text-[10px] text-slate-500 font-semibold">ကာဗာပါ စာအုပ်</div>
+            </div>
+            <div class="rounded-xl bg-slate-100 dark:bg-slate-800/60 p-2.5 text-center">
+              <div class="text-lg font-black text-slate-700 dark:text-slate-200">3,892</div>
+              <div class="text-[10px] text-slate-500 font-semibold">စာရင်းသွင်း</div>
+            </div>
+          </div>
+          <div class="text-xs text-slate-500 pt-1 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
+            <span>🕒 ဖွင့်ချိန်</span>
+            <span class="font-bold text-slate-700 dark:text-slate-300">08:30 – 16:30</span>
+          </div>
+        </div>
+
+        <!-- Categories Filter -->
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-2 shadow-sm">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">ကဏ္ဍများ (Categories)</h3>
+          <div id="categoryList" class="space-y-1"></div>
+        </div>
+
+        <!-- Newspapers Quick Box -->
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-2 shadow-sm">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">ယနေ့ထုတ် သတင်းစာ</h3>
+          <p class="text-xs font-bold">ကြေးမုံ / မြန်မာ့အလင်း သတင်းစာ</p>
+          <p class="text-[11px] text-slate-500">နေ့စဉ်ထုတ် သတင်းစာများကို PDF ဖြင့် အခမဲ့ ဖတ်ရှုနိုင်ပါသည်။</p>
+          <button onclick="setTab('pubs')" class="w-full rounded-xl bg-brand-500/10 py-2 text-xs font-bold text-brand-600 dark:text-brand-400 hover:bg-brand-500 hover:text-white transition">
+            သတင်းစာများ ဖတ်မည်
+          </button>
+        </div>
+      </aside>
+
+      <!-- RIGHT MAIN CONTENT -->
+      <main class="flex-1 min-w-0 space-y-5">
+        <!-- HOME VIEW -->
+        <div id="homeSection" class="space-y-5">
+          <!-- Stories Carousel -->
+          <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-sm">
+            <div class="no-scrollbar flex gap-3 overflow-x-auto" id="storiesBar"></div>
+          </div>
+
+          <!-- Featured Row -->
+          <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h2 class="text-base font-extrabold">အထူးအကြံပြု စာအုပ်များ (Featured Books)</h2>
+                <p class="text-xs text-slate-500">ကာဗာဓာတ်ပုံပါ စာအုပ်သစ်များ</p>
+              </div>
+              <button onclick="setTab('books')" class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline">အားလုံးကြည့် →</button>
+            </div>
+            <div class="no-scrollbar flex gap-3.5 overflow-x-auto py-1" id="featuredRow"></div>
+          </div>
+
+          <!-- Book Grid Header -->
+          <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h2 class="text-base font-extrabold">စာအုပ်များ စုစည်းမှု</h2>
+                <p id="bookCountLabel" class="text-xs text-slate-500"></p>
+              </div>
+              <div class="flex gap-1.5 overflow-x-auto no-scrollbar" id="mobileCatPills"></div>
+            </div>
+            <!-- Grid -->
+            <div id="booksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3.5"></div>
+          </div>
+        </div>
+
+        <!-- NEWSPAPERS VIEW -->
+        <div id="pubsSection" class="hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+          <h2 class="text-lg font-black">နေ့စဉ်သတင်းစာများနှင့် ဂျာနယ်များ</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-2">
+              <h3 class="font-bold text-base">ကြေးမုံ သတင်းစာ</h3>
+              <p class="text-xs text-slate-500">၂၀၂၆ ခုနှစ် အောက်တိုဘာလ ၂၃ ရက်ထုတ်</p>
+              <button class="px-4 py-2 rounded-lg bg-brand-600 text-white text-xs font-bold shadow">PDF ဖတ်ရှုမည်</button>
+            </div>
+            <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-2">
+              <h3 class="font-bold text-base">မြန်မာ့အလင်း သတင်းစာ</h3>
+              <p class="text-xs text-slate-500">၂၀၂၆ ခုနှစ် အောက်တိုဘာလ ၂၃ ရက်ထုတ်</p>
+              <button class="px-4 py-2 rounded-lg bg-brand-600 text-white text-xs font-bold shadow">PDF ဖတ်ရှုမည်</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DONATE VIEW -->
+        <div id="donateSection" class="hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm space-y-4 max-w-xl mx-auto text-center">
+          <div class="w-14 h-14 mx-auto rounded-full bg-brand-500/20 text-brand-600 flex items-center justify-center text-2xl">🎁</div>
+          <h2 class="text-xl font-black">စာအုပ်နှင့် စာကြည့်တိုက် ရန်ပုံငွေ လှူဒါန်းရန်</h2>
+          <p class="text-xs text-slate-500 leading-relaxed">OCDI စာကြည့်တိုက် ဖွံ့ဖြိုးတိုးတက်ရေးအတွက် သုတရသစာအုပ်များ၊ နည်းပညာစာအုပ်များနှင့် Digital Resources များကို လှူဒါန်းနိုင်ပါသည်ခင်ဗျာ။</p>
+          <button class="w-full py-3 rounded-xl bg-brand-600 text-white font-bold text-xs shadow-md">ဆက်သွယ်စုံစမ်းမည်</button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- BOOK DETAIL MODAL -->
+  <div id="bookModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 max-w-md w-full shadow-2xl space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800">
+        <span id="modalCategory" class="text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-500/10 px-3 py-1 rounded-full"></span>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">✕</button>
+      </div>
+      <div class="flex gap-4">
+        <div class="w-28 shrink-0">
+          <img id="modalCover" class="w-full aspect-[2/3] object-cover rounded-xl shadow-md" src="" alt="">
+        </div>
+        <div class="flex-1 space-y-1">
+          <h3 id="modalTitle" class="text-base font-extrabold leading-snug"></h3>
+          <p id="modalAuthor" class="text-xs font-semibold text-brand-600 dark:text-brand-400"></p>
+          <div class="text-[11px] text-slate-500 space-y-0.5 pt-1.5">
+            <p id="modalYear"></p>
+            <p id="modalShelf"></p>
+            <p id="modalCopies" class="text-emerald-500 font-bold"></p>
+            <p id="modalRating" class="text-amber-500 font-bold"></p>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-xl bg-slate-100 dark:bg-slate-800/50 p-3 space-y-1">
+        <h4 class="text-xs font-bold">အကြောင်းအရာ အကျဉ်း</h4>
+        <p id="modalDesc" class="text-xs text-slate-500 leading-relaxed"></p>
+      </div>
+      <button onclick="alert('စာအုပ်ငှားရမ်းမှု တောင်းဆိုပြီးပါပြီ။ စာကြည့်တိုက်မှူးထံ လာရောက်ထုတ်ယူနိုင်ပါသည်။'); closeModal();" class="w-full py-2.5 rounded-xl bg-brand-600 text-white font-bold text-xs shadow">စာအုပ် ငှားရမ်းမည်</button>
+    </div>
+  </div>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex justify-around py-2">
+    <button onclick="setTab('home')" class="flex flex-col items-center text-[10px] font-bold text-brand-600"><span class="text-base">🏠</span>ပင်မ</button>
+    <button onclick="setTab('books')" class="flex flex-col items-center text-[10px] font-bold text-slate-500"><span class="text-base">📖</span>စာအုပ်</button>
+    <button onclick="setTab('pubs')" class="flex flex-col items-center text-[10px] font-bold text-slate-500"><span class="text-base">📰</span>သတင်းစာ</button>
+    <button onclick="setTab('donate')" class="flex flex-col items-center text-[10px] font-bold text-slate-500"><span class="text-base">🎁</span>လှူဒါန်း</button>
+  </nav>
+
+  <script>
+    const allBooks = [{"id": "local-1", "title": "နွေတစ်ည", "author": "နိုင်ဝင်းဆွေ", "category": "ရသစာပေ", "year": "1970", "shelf": "B-3", "cover": "/covers/cover_naing_win_swe.jpg", "rating": 4.9, "copies": 2, "desc": "စာရေးဆရာ နိုင်ဝင်းဆွေ ၏ ထင်ရှားသော ရသဝတ္ထုရှည်"}, {"id": "local-2", "title": "ရှားလော့ဒေဝီ ဘာသာပြန်ကဗျာများ", "author": "တက္ကသိုလ်ဘုန်းနိုင်", "category": "ဘာသာပြန်", "year": "1985", "shelf": "B-1", "cover": "/covers/cover_charlotte_devi.jpg", "rating": 4.8, "copies": 1, "desc": "တက္ကသိုလ်ဘုန်းနိုင်၏ လက်ရာမွန် ဘာသာပြန်ကဗျာများ"}, {"id": "local-3", "title": "တိမ်ညိုအလွင့် လအမြင့် (၂)", "author": "တက္ကသိုလ်ဘုန်းနိုင်", "category": "ရသစာပေ", "year": "1988", "shelf": "B-1", "cover": "/covers/cover_teim_nyo.jpg", "rating": 4.9, "copies": 2, "desc": "နာမည်ကျော် ဝတ္ထုရှည် တွဲ(၂)"}, {"id": "local-4", "title": "IKIGAI (အိကီဂိုင်)", "author": "Hector Garcia & Francesc Miralles", "category": "အတွေးအခေါ်/စေ့ဆော်မှု", "year": "2020", "shelf": "C-2", "cover": "/covers/cover_ikigai.jpg", "rating": 4.9, "copies": 3, "desc": "ဂျပန်လူမျိုးတို့၏ အသက်ရှည်ကျန်းမာ ပျော်ရွှင်စွာ နေထိုင်နည်း လျှို့ဝှက်ချက်"}, {"id": "local-5", "title": "သူ့ကျွန်မခံပြီ", "author": "သခင်ကိုယ်တော်မှိုင်း / မြန်မာ့စာပေ", "category": "သမိုင်း/နိုင်ငံရေး", "year": "1965", "shelf": "A-2", "cover": "/covers/cover_thu_kyun_ma_khan_pyi.jpg", "rating": 5.0, "copies": 1, "desc": "မြန်မာ့သမိုင်းနှင့် မျိုးချစ်စိတ်ဓာတ်ရှင်သန်ရေး ဂန္တဝင်စာအုပ်ကြီး"}, {"id": "local-6", "title": "တောင်တန်းတွေရဲ့အလွန်", "author": "ပုညခင်", "category": "ရသစာပေ", "year": "2016", "shelf": "B-4", "cover": "/covers/cover_taung_tan_dway.jpg", "rating": 4.8, "copies": 2, "desc": "ပုညခင် ရေးသားသော လူကြိုက်များ ရသဝတ္ထု"}, {"id": "local-7", "title": "ခိုးခိုးခစ်ခစ် (ဟာသဝတ္ထုတိုများ)", "author": "မင်းလူ", "category": "ဟာသ/ရသ", "year": "1995", "shelf": "B-2", "cover": "/covers/cover_min_lu_khoe.jpg", "rating": 4.7, "copies": 2, "desc": "စာရေးဆရာ မင်းလူ ၏ ဘဝအမြင် ဟာသဝတ္ထုတိုများ စုစည်းမှု"}, {"id": "local-8", "title": "Steels: Microstructure and Properties", "author": "H. Bhadeshia, R. Honeycombe", "category": "နည်းပညာ", "year": "2017", "shelf": "E-4", "cover": "/covers/cover_steels_microstructure.jpg", "rating": 4.7, "copies": 2, "desc": "သတ္တုဗေဒနှင့် အင်ဂျင်နီယာဆိုင်ရာ အဆင့်မြင့် စာအုပ်"}, {"id": "local-9", "title": "Manufacturing Technology", "author": "R.K. Rajput", "category": "နည်းပညာ", "year": "2015", "shelf": "E-2", "cover": "/covers/cover_manufacturing_tech.jpg", "rating": 4.6, "copies": 3, "desc": "စက်မှုနည်းပညာနှင့် ထုတ်လုပ်မှုအင်ဂျင်နီယာ သင်ရိုးစာအုပ်"}, {"id": "local-10", "title": "Grade 11 Physics စနစ်သစ်", "author": "ပညာရေးဝန်ကြီးဌာန", "category": "ပညာရေး", "year": "2023", "shelf": "D-1", "cover": "/covers/cover_grade11_physics.jpg", "rating": 4.8, "copies": 5, "desc": "အထက်တန်းအဆင့် စနစ်သစ် ရူပဗေဒ ပြဋ္ဌာန်းစာအုပ်"}, {"id": "3906", "title": "ပြည်ထောင်စုကျေးလက်ပျော်ရွှင်မှုများ", "author": "မြ၀တီစာပေတိုက်", "category": "နည်းပညာ", "year": "2026", "shelf": "စင်-5", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6aba079192d6f.jpg", "rating": 4.4, "copies": 2, "desc": "ဒုတိယကြိမ်"}, {"id": "3903", "title": "ဈေးကွက်စီမံခန့်ခွဲမှုပညာ", "author": "ပန်းဆက်လမ်း", "category": "နည်းပညာ", "year": "2019", "shelf": "စင်-4", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6a97ec8f12027.jpg", "rating": 4.8, "copies": 1, "desc": "ပထမအကြိမ်"}, {"id": "3901", "title": "ငါ့ကိုမချစ်ပါနဲ့", "author": "ရွှေပါရမီစာပေ", "category": "သမိုင်း", "year": "2014", "shelf": "စင်-1", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6a8faf24170f9.jpg", "rating": 4.6, "copies": 1, "desc": "ဆဠမအကြိမ်"}, {"id": "3902", "title": "တစ်ပိုင်တစ်နိုင်ဝမ်းစာကြိတ်ဆန်စက်ငယ်အခြေခံ", "author": "ပခုက္ကူစာပေ", "category": "ရသစာပေ", "year": "2020", "shelf": "စင်-6", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6a8fb3808c3ac.jpg", "rating": 4.7, "copies": 1, "desc": "ပထမအကြိမ်"}, {"id": "3888", "title": "စတင်လေ့လာကွန်ပြူတာ", "author": "မဖော်ပြထား", "category": "နည်းပညာ", "year": "2022", "shelf": "စင်-5", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6a4f686e47f61.jpg", "rating": 4.7, "copies": 1, "desc": "စတင်လေ့လာကွန်ပြူတာ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3889", "title": "စတင်လေ့လာကွန်ပျူတာ", "author": "မဖော်ပြထား", "category": "နည်းပညာ", "year": "1993", "shelf": "စင်-2", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6a4f6c5c8174b.jpg", "rating": 4.8, "copies": 1, "desc": "စတင်လေ့လာကွန်ပျူတာ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3873", "title": "ခြောက်လှန့်တက်သောဘုရားကျောင်း", "author": "မဖော်ပြထား", "category": "ပညာရေး", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6947be4033f81.jpg", "rating": 4.6, "copies": 1, "desc": "ခြောက်လှန့်တက်သောဘုရားကျောင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3872", "title": "ကျွန်ုပ်တန်ဖိုးထားတဲ့အမှန်တရား", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69467bc13aa2d.jpg", "rating": 4.5, "copies": 1, "desc": "ကျွန်ုပ်တန်ဖိုးထားတဲ့အမှန်တရား စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3864", "title": "ဆောင်းဦးပေါက်လျှင်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_693e58d13019a.jpg", "rating": 4.4, "copies": 2, "desc": "ဆောင်းဦးပေါက်လျှင် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3865", "title": "ဆီမုဆိုး", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_693e590a8f92f.jpg", "rating": 4.5, "copies": 1, "desc": "ဆီမုဆိုး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3866", "title": "နေလောင်ပန်းမို့", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_693e59335d025.jpg", "rating": 4.6, "copies": 1, "desc": "နေလောင်ပန်းမို့ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3867", "title": "အဖေ့အတွက်အသက်ပေးသောသား", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_693e5edce7069.jpg", "rating": 4.7, "copies": 1, "desc": "အဖေ့အတွက်အသက်ပေးသောသား စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3869", "title": "လှတောသားနင့်လှတောသူ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_693e8ad082256.jpg", "rating": 4.9, "copies": 1, "desc": "လှတောသားနင့်လှတောသူ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3862", "title": "ကန္တာရဆူး", "author": "ခင်ဝါဆွေ", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69369c72c614a.jpg", "rating": 4.9, "copies": 2, "desc": "ကန္တာရဆူး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3863", "title": "လောကအလှဘဝကြေးမုံ", "author": "ဦးညွှန့်ဟံ", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69369cbf67289.jpg", "rating": 5.0, "copies": 2, "desc": "လောကအလှဘဝကြေးမုံ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3860", "title": "မြန်မာနိုင်ငံနှင့်မြန်မာနိုင်ငံရေး", "author": "မဖော်ပြထား", "category": "သမိုင်း", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69353de0ec40b.jpg", "rating": 4.7, "copies": 1, "desc": "မြန်မာနိုင်ငံနှင့်မြန်မာနိုင်ငံရေး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3854", "title": "မေမေ့ကိုသတိရပါနှင့်အခြားပုံပြင်များ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6933a859ad273.jpg", "rating": 4.8, "copies": 1, "desc": "မေမေ့ကိုသတိရပါနှင့်အခြားပုံပြင်များ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3855", "title": "ပညာရေးဌာနသမိုင်း", "author": "မဖော်ပြထား", "category": "သမိုင်း", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6933a8af13962.jpg", "rating": 4.9, "copies": 1, "desc": "ပညာရေးဌာနသမိုင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3857", "title": "ရုပ်ပြောင်းနာမ်ခွာမိစ္ဆာ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6933fdc5b9638.jpg", "rating": 4.4, "copies": 1, "desc": "ရုပ်ပြောင်းနာမ်ခွာမိစ္ဆာ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3858", "title": "ထင်ရဘူးနော်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6933fdf359b18.jpg", "rating": 4.5, "copies": 1, "desc": "ထင်ရဘူးနော် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3859", "title": "ချော်နေသောအံများ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6933fe225037b.jpg", "rating": 4.6, "copies": 1, "desc": "ချော်နေသောအံများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3847", "title": "အသက်အသည်းဦးမောင်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692bc3262a4eb.jpg", "rating": 4.8, "copies": 2, "desc": "အသက်အသည်းဦးမောင် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3848", "title": "သုတရုပ်စုံ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692bc37b6cacc.jpg", "rating": 4.9, "copies": 2, "desc": "သုတရုပ်စုံ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3849", "title": "သစ္စာဖြင့်သာစီရင်စေ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692bc3e54cb37.jpg", "rating": 5.0, "copies": 2, "desc": "သစ္စာဖြင့်သာစီရင်စေ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3844", "title": "အာလာဒင်နှင့်မီးခွက်ဆန်း", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692a7a9100992.jpg", "rating": 4.5, "copies": 1, "desc": "အာလာဒင်နှင့်မီးခွက်ဆန်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3845", "title": "အရှင်လတ်လတ်မြေမျိုခံရသူများ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692a7af8817ea.jpg", "rating": 4.6, "copies": 1, "desc": "အရှင်လတ်လတ်မြေမျိုခံရသူများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3846", "title": "ကာတွန်းမောင်မောင်လေး", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692a7b248c7c3.jpg", "rating": 4.7, "copies": 1, "desc": "ကာတွန်းမောင်မောင်လေး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3843", "title": "လှတောသားလက်ရွေးစင်ဟာသဥပမာများ", "author": "ဦးသန်းထွဋ်အောင်", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69266af8db5c5.jpg", "rating": 4.4, "copies": 2, "desc": "လှတောသားလက်ရွေးစင်ဟာသဥပမာများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3840", "title": "ခိုးခိုးခစ်ခစ်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69242e281e3f8.jpg", "rating": 4.8, "copies": 1, "desc": "ခိုးခိုးခစ်ခစ် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3841", "title": "မြဝတီစစ်ကြောင်း", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69242e6ff1211.jpg", "rating": 4.9, "copies": 1, "desc": "မြဝတီစစ်ကြောင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3842", "title": "အရှက်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69242e90ceb95.jpg", "rating": 5.0, "copies": 2, "desc": "အရှက် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3835", "title": "၂၀ ရာစုမြန်မာစာရေးစရာ၁၀၀", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6923cdd5b73f1.jpg", "rating": 5.0, "copies": 1, "desc": "၂၀ ရာစုမြန်မာစာရေးစရာ၁၀၀ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3836", "title": "ဗန်းမော်ဆရာတော်စွယ်စုံပုံပြင်များ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692412fa3d05f.jpg", "rating": 4.4, "copies": 1, "desc": "ဗန်းမော်ဆရာတော်စွယ်စုံပုံပြင်များ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3837", "title": "ဗုဒ္ဓခေတ်အမြင်အတွေး", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692413431f670.jpg", "rating": 4.5, "copies": 1, "desc": "ဗုဒ္ဓခေတ်အမြင်အတွေး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3838", "title": "ပန်းဝတ်လွှာပုံပြင်များ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69241393cdfb0.jpg", "rating": 4.6, "copies": 1, "desc": "ပန်းဝတ်လွှာပုံပြင်များ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3830", "title": "မင်းသမီးလေး၏ဒဏ္ဍရီ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6922ae2e3e450.jpg", "rating": 4.5, "copies": 1, "desc": "မင်းသမီးလေး၏ဒဏ္ဍရီ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3832", "title": "ကျောက်ကြီးငသြ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6922b0202ea2d.jpg", "rating": 4.7, "copies": 1, "desc": "ကျောက်ကြီးငသြ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3833", "title": "သတိရသမျှထာဝရအတူ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6922b06e65519.jpg", "rating": 4.8, "copies": 1, "desc": "သတိရသမျှထာဝရအတူ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3815", "title": "CITY", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69212aa9094f9.jpg", "rating": 4.4, "copies": 1, "desc": "CITY စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3816", "title": "ပန်းအလက်ာမဂ္ဂဇင်း", "author": "မဖော်ပြထား", "category": "မဂ္ဂဇင်း", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69212ad33e1d5.jpg", "rating": 4.5, "copies": 1, "desc": "ပန်းအလက်ာမဂ္ဂဇင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3818", "title": "ကလေးတို့အတွက်AtoZပုံပြင်များ", "author": "ဦးသိန်းဇော်", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-၃", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69213d4eae7cf.jpg", "rating": 4.7, "copies": 1, "desc": "ကလေးတို့အတွက်AtoZပုံပြင်များ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3826", "title": "ဇာတ်တော်ကြီးဆယ်ဘွဲ့", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692177c5357e6.jpg", "rating": 4.8, "copies": 1, "desc": "ဇာတ်တော်ကြီးဆယ်ဘွဲ့ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3810", "title": "တစ်စက္ကန့်ဒေါသစကားပေးဆပ်ရသည်ကအလွန်များ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69203a21ddfaa.jpg", "rating": 4.6, "copies": 1, "desc": "တစ်စက္ကန့်ဒေါသစကားပေးဆပ်ရသည်ကအလွန်များ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3811", "title": "တစ္ဆေတစ်ရာမှော်ဝင်ဓား", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69203a6a2b800.jpg", "rating": 4.7, "copies": 1, "desc": "တစ္ဆေတစ်ရာမှော်ဝင်ဓား စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3812", "title": "မျိုးနှင့်အခြားရသစာစုများ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69203aa22e78f.jpg", "rating": 4.8, "copies": 1, "desc": "မျိုးနှင့်အခြားရသစာစုများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3813", "title": "အမျိုးသမီးရောဂါစာများ၁+၂", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69203af37c246.jpg", "rating": 4.9, "copies": 1, "desc": "အမျိုးသမီးရောဂါစာများ၁+၂ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3814", "title": "မြန်မာတို့ဆိုရိုးစကားပုံအမျိုးမျိုး", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692045c071b7e.jpg", "rating": 5.0, "copies": 2, "desc": "မြန်မာတို့ဆိုရိုးစကားပုံအမျိုးမျိုး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3809", "title": "ကျွန်မဘ၀နဲ့ရင်းပြီးရခဲ့သောသင်ခန်းစာများ", "author": "ဦးသန့်ဇင်ထူး", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-3", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691ef56cbf1df.jpg", "rating": 4.5, "copies": 2, "desc": "ကျွန်မဘ၀နဲ့ရင်းပြီးရခဲ့သောသင်ခန်းစာများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3806", "title": "ရော်ဘင်ဆင်ကရူးဆိုး", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691d3093ec496.jpg", "rating": 4.9, "copies": 1, "desc": "ရော်ဘင်ဆင်ကရူးဆိုး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3802", "title": "မောင့်လက်ဖဝါးပေါ်ကကျွန်မနှလုံးသား", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691a977b543be.jpg", "rating": 4.5, "copies": 1, "desc": "မောင့်လက်ဖဝါးပေါ်ကကျွန်မနှလုံးသား စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3804", "title": "အရပ်တစ်ပါးမှဝတ္ထုများ", "author": "ဦးစိန်၀င်း", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-3", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691aee3e59cac.jpg", "rating": 4.7, "copies": 1, "desc": "အရပ်တစ်ပါးမှဝတ္ထုများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3797", "title": "နှစ်ကိုယ်တူယှဥ်မိုး", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6919506114613.jpg", "rating": 4.7, "copies": 1, "desc": "နှစ်ကိုယ်တူယှဥ်မိုး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3798", "title": "အချစ်ရယ်တောင်စွယ်မှာနေကွယ်မှတော့", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691950c098733.jpg", "rating": 4.8, "copies": 1, "desc": "အချစ်ရယ်တောင်စွယ်မှာနေကွယ်မှတော့ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3799", "title": "နှလုံးသားစီးချင်း", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691951c533758.jpg", "rating": 4.9, "copies": 1, "desc": "နှလုံးသားစီးချင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3800", "title": "လျှို့ဝှက်သောအချစ်ရောင်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69195229aee4d.jpg", "rating": 5.0, "copies": 1, "desc": "လျှို့ဝှက်သောအချစ်ရောင် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3801", "title": "ပုလင်းထဲကတစ္ဆေ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691981a669e82.jpg", "rating": 4.4, "copies": 1, "desc": "ပုလင်းထဲကတစ္ဆေ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3796", "title": "ပင့်ကူပုံပြင်နှင့်အနောက်အာဖရိကရိုးရာပုံပြင်များ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6916db1d9e5c8.jpg", "rating": 4.6, "copies": 1, "desc": "ပင့်ကူပုံပြင်နှင့်အနောက်အာဖရိကရိုးရာပုံပြင်များ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3791", "title": "ဝတ္တုတိုပေါင်းချုပ်သစ်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691570aabea6b.jpg", "rating": 4.8, "copies": 1, "desc": "ဝတ္တုတိုပေါင်းချုပ်သစ် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3792", "title": "မဂ်လာနံနက်ခင်းနှင့်ဇာတကလာဝတ္တုတိုများ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6915710596d91.jpg", "rating": 4.9, "copies": 1, "desc": "မဂ်လာနံနက်ခင်းနှင့်ဇာတကလာဝတ္တုတိုများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3795", "title": "မသိတာမရှတဲ့လူ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6915b06d34f0c.jpg", "rating": 4.5, "copies": 1, "desc": "မသိတာမရှတဲ့လူ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3782", "title": "အယူလွဲအမှတ်လွဲနေကြသောဘာသာရေးလူမှုရေးဆိုင်ရာပြဿနာများ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69005eebd3763.jpg", "rating": 4.6, "copies": 1, "desc": "အယူလွဲအမှတ်လွဲနေကြသောဘာသာရေးလူမှုရေးဆိုင်ရာပြဿနာများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3787", "title": "ဇာတ်တော်ကြီးဆယ်ဘွဲ့ပုံဝတ္တု", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69009ac080eb5.jpg", "rating": 4.4, "copies": 1, "desc": "ဇာတ်တော်ကြီးဆယ်ဘွဲ့ပုံဝတ္တု စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3773", "title": "မိဘမေတ္တာနှင့်အခြားပုံပြင်များ", "author": "ဦးချစ်ညွှန့်", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6933a7aeede0b.jpg", "rating": 4.4, "copies": 1, "desc": "မိဘမေတ္တာနှင့်အခြားပုံပြင်များ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3772", "title": "ဂြိုလ်မွှေတဲ့ရွှေ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692411f4e28e7.jpg", "rating": 5.0, "copies": 1, "desc": "ဂြိုလ်မွှေတဲ့ရွှေ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3760", "title": "မှိုနတ်သမီး", "author": "မဖော်ပြထား", "category": "သမိုင်း", "year": "1996", "shelf": "စင်-1", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692bc444ca876.jpg", "rating": 4.5, "copies": 1, "desc": "မှိုနတ်သမီး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3749", "title": "လူကောင်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6933fc6db01ec.jpg", "rating": 4.8, "copies": 1, "desc": "လူကောင် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3750", "title": "သွေးစားဧကရီ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692bc1039e419.jpg", "rating": 4.9, "copies": 2, "desc": "သွေးစားဧကရီ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3751", "title": "ကြယ်စင်ည၏အိမ်မက်သံစဥ်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6922af461e46c.jpg", "rating": 5.0, "copies": 1, "desc": "ကြယ်စင်ည၏အိမ်မက်သံစဥ် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3743", "title": "သံသပိတ်နှင့်ဂမ္ဘီရဝတ္တုတိုများ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692412a39bede.jpg", "rating": 4.9, "copies": 1, "desc": "သံသပိတ်နှင့်ဂမ္ဘီရဝတ္တုတိုများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3744", "title": "ငရဲဟူသည်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6933e3eaf2d37.jpg", "rating": 5.0, "copies": 1, "desc": "ငရဲဟူသည် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3730", "title": "အစိမ်းသရဲတစ္ဆေဖုတ်ပြိတ္တာများ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_68f1d1a40b10d.jpg", "rating": 5.0, "copies": 1, "desc": "အစိမ်းသရဲတစ္ဆေဖုတ်ပြိတ္တာများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3735", "title": "ကောင်းမှုနဲ့မကောင်းမှု", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6919802cc4be8.jpg", "rating": 4.8, "copies": 1, "desc": "ကောင်းမှုနဲ့မကောင်းမှု စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3737", "title": "ချီပါသား ပခန်းသား စကားတောင်စား", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_68f1f334aced3.jpg", "rating": 5.0, "copies": 2, "desc": "ချီပါသား ပခန်းသား စကားတောင်စား စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3723", "title": "ဝေါ်ကီတော်ကီ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_68f06525673ec.jpg", "rating": 5.0, "copies": 1, "desc": "ဝေါ်ကီတော်ကီ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3727", "title": "လူလိမ်ကိုဒဏ်ခတ်ခြင်း", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_68f069213db88.jpg", "rating": 4.7, "copies": 1, "desc": "လူလိမ်ကိုဒဏ်ခတ်ခြင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3716", "title": "တမလွန်ခရီးသို့", "author": "ဦးမြသန်း", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_68ef3c41a2e46.jpg", "rating": 5.0, "copies": 1, "desc": "တမလွန်ခရီးသို့ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3707", "title": "ပန်းရွှေပြည်ပုံပြင်များ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_68f1e721844d4.jpg", "rating": 4.8, "copies": 1, "desc": "ပန်းရွှေပြည်ပုံပြင်များ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3708", "title": "ရင်နဲ့ရွာတဲ့မိုး", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6933fcc969cf0.jpg", "rating": 4.9, "copies": 1, "desc": "ရင်နဲ့ရွာတဲ့မိုး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3709", "title": "ဂမုန်းစားဘီလူး", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692bc24bbac86.jpg", "rating": 5.0, "copies": 2, "desc": "ဂမုန်းစားဘီလူး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3713", "title": "ဟာသမြောက်ပုံတိုပတ်စများ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69217800d6638.jpg", "rating": 4.7, "copies": 1, "desc": "ဟာသမြောက်ပုံတိုပတ်စများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3680", "title": "လှတောသား၏စကားပဒေသာ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692178197f7b7.jpg", "rating": 4.9, "copies": 1, "desc": "လှတောသား၏စကားပဒေသာ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3687", "title": "အကြံကြီးသူ၏နောက်ဆုံးရလဒ်(ပထမပိုင်း)", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_693e578d0b08a.jpg", "rating": 4.9, "copies": 1, "desc": "အကြံကြီးသူ၏နောက်ဆုံးရလဒ်(ပထမပိုင်း) စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3688", "title": "အကြံကြီးသူ၏နောက်ဆုံးရလဒ်(ဒုတိယပိုင်း)", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_693e57acf2737.jpg", "rating": 5.0, "copies": 1, "desc": "အကြံကြီးသူ၏နောက်ဆုံးရလဒ်(ဒုတိယပိုင်း) စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3689", "title": "အကြံကြီးသူ၏နောက်ဆုံးရလဒ်(တတိယပိုင်း)", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_693e57cd9b0ab.jpg", "rating": 4.4, "copies": 1, "desc": "အကြံကြီးသူ၏နောက်ဆုံးရလဒ်(တတိယပိုင်း) စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3690", "title": "လောဘပင်လယ်နှင့်ပုလဲနက်ရန်စွယ်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691949902dbf7.jpg", "rating": 4.5, "copies": 1, "desc": "လောဘပင်လယ်နှင့်ပုလဲနက်ရန်စွယ် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3675", "title": "မဟာမြိုင်ဂူမှတ်တမ်း", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69194fefe64fe.jpg", "rating": 4.4, "copies": 1, "desc": "မဟာမြိုင်ဂူမှတ်တမ်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3668", "title": "အတုံ့အလှည့်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6919815f2fffe.jpg", "rating": 4.4, "copies": 1, "desc": "အတုံ့အလှည့် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3669", "title": "ငကြွား", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6916fda42da49.jpg", "rating": 4.5, "copies": 1, "desc": "ငကြွား စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3665", "title": "အလျော်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692048c56feba.jpg", "rating": 4.8, "copies": 1, "desc": "အလျော် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3666", "title": "အပြေးအလွှား", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6920572a3f11a.jpg", "rating": 4.9, "copies": 1, "desc": "အပြေးအလွှား စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3667", "title": "တရားတော်လာပုံပမာ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6933e4d9d57ec.jpg", "rating": 5.0, "copies": 1, "desc": "တရားတော်လာပုံပမာ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3648", "title": "မကြောက်သူ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6916fdf2e0e0a.jpg", "rating": 4.5, "copies": 1, "desc": "မကြောက်သူ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3655", "title": "ဘဲရုပ်ဆိုးလေး", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692a79b3c00c6.jpg", "rating": 4.5, "copies": 1, "desc": "ဘဲရုပ်ဆိုးလေး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3632", "title": "ဘကြီးပြုံးပုံပြင်များ(၁)", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69198225af98c.jpg", "rating": 5.0, "copies": 1, "desc": "ဘကြီးပြုံးပုံပြင်များ(၁) စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3622", "title": "လှည့်စားဖန်ဖန်လောကဓံဝတ္တုတိုများ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691d2fd3024a5.jpg", "rating": 4.7, "copies": 1, "desc": "လှည့်စားဖန်ဖန်လောကဓံဝတ္တုတိုများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3615", "title": "အချစ်ဘုံမှာခိုက်ခိုက်တုန်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69194fc283b0a.jpg", "rating": 4.7, "copies": 1, "desc": "အချစ်ဘုံမှာခိုက်ခိုက်တုန် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3616", "title": "စိတ်ဝိညာဥ်ဖြစ်ရပ်ဆန်းနှင့်သေရွာပြန်မှတ်တမ်းများ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6923cda854756.jpg", "rating": 4.8, "copies": 2, "desc": "စိတ်ဝိညာဥ်ဖြစ်ရပ်ဆန်းနှင့်သေရွာပြန်မှတ်တမ်းများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3621", "title": "ထူးတော်မြူးသည့်ဦးပေါ်ဦး", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69266a9a2c2a8.jpg", "rating": 4.6, "copies": 2, "desc": "ထူးတော်မြူးသည့်ဦးပေါ်ဦး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3612", "title": "ထင်ရှားသောဆရာတော်ကြီးများ၏ပညာပေးအဆုံးအမ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6922ae0be3907.jpg", "rating": 4.4, "copies": 2, "desc": "ထင်ရှားသောဆရာတော်ကြီးများ၏ပညာပေးအဆုံးအမ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3604", "title": "သံကြိုးပြတ်နှင့်မဟူရာဆင်သချ်ိုင်း", "author": "ဒေါ်ကေခိုင်ဦး", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6922af98c07c2.jpg", "rating": 5.0, "copies": 1, "desc": "သံကြိုးပြတ်နှင့်မဟူရာဆင်သချ်ိုင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3609", "title": "စာကျက်ချိန်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6920496d6e660.jpg", "rating": 4.8, "copies": 1, "desc": "စာကျက်ချိန် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3595", "title": "မေတ္တာခရီး", "author": "ဦးသိန်းဇော်", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6916fdcc524dc.jpg", "rating": 4.8, "copies": 1, "desc": "မေတ္တာခရီး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3584", "title": "အံ့သြသွားအောင်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_693517d3d490c.jpg", "rating": 4.4, "copies": 1, "desc": "အံ့သြသွားအောင် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3585", "title": "အကောင်းဆုံးလက်ဆောင်", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6920494790d23.jpg", "rating": 4.5, "copies": 1, "desc": "အကောင်းဆုံးလက်ဆောင် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3582", "title": "ဘုရားရှင်လက်ထက်ကပြိတ္တာများ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_693e897c83932.jpg", "rating": 4.9, "copies": 1, "desc": "ဘုရားရှင်လက်ထက်ကပြိတ္တာများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3566", "title": "စက်ကြိုးဆွဲမဖဲဝါ", "author": "မဖော်ပြထား", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6922afc80ac03.jpg", "rating": 4.7, "copies": 1, "desc": "စက်ကြိုးဆွဲမဖဲဝါ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3560", "title": "Buddha", "author": "mmm", "category": "ရသစာပေ", "year": "1980", "shelf": "စင်-1-6", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_68ba8ae50ecf0.jpg", "rating": 4.8, "copies": 5, "desc": "hsgskgd"}, {"id": "1026", "title": "မှော်ဆရာမှတ်တမ်း", "author": "ကိုကိုလေး", "category": "ရသစာပေ", "year": "2004", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691d9c6102513.jpg", "rating": 4.8, "copies": 1, "desc": "မှော်ဆရာမှတ်တမ်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "787", "title": "ဗိုလ်ချုပ်အောင်ဆန်း၏ စာပေလက်ရာ", "author": "မြဟန်", "category": "ရသစာပေ", "year": "1998", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6916daf315042.jpg", "rating": 4.7, "copies": 1, "desc": "ဗိုလ်ချုပ်အောင်ဆန်း၏ စာပေလက်ရာ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "2592", "title": "မြဝတီမဂ္ဂဇင်း", "author": "ကလောင်စုံ", "category": "မဂ္ဂဇင်း", "year": "2020", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6946216b8a6de.jpg", "rating": 4.6, "copies": 2, "desc": "မြဝတီမဂ္ဂဇင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "1072", "title": "မေတ္တာပုလ္လင်နန်းထက်က", "author": "မြပုလဲခင်", "category": "ရသစာပေ", "year": "2006", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692bc194d5a1a.jpg", "rating": 4.5, "copies": 1, "desc": "မေတ္တာပုလ္လင်နန်းထက်က စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "586", "title": "နှစ်ယောက်တစ်ယောက်", "author": "စောညို", "category": "ရသစာပေ", "year": "2004", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6922aea4aca8a.jpg", "rating": 4.9, "copies": 1, "desc": "နှစ်ယောက်တစ်ယောက် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3153", "title": "တေဇရုပ်စုံ", "author": "ကလောင်စုံ", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692d5472c30b3.jpg", "rating": 4.7, "copies": 1, "desc": "တေဇရုပ်စုံ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "99", "title": "ကချင်ပြည်နယ်တိုင်းရင်းသားများ၏ \nမြန်မာ့လွတ်လပ်ရေးကြိုးပမ်းမှုသမိုင်း", "author": "ဇွဲသန်းသျှင်း", "category": "သမိုင်း", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6916bf71e2194.jpg", "rating": 4.5, "copies": 1, "desc": "ကချင်ပြည်နယ်တိုင်းရင်းသားများ၏ \nမြန်မာ့လွတ်လပ်ရေးကြိုးပမ်းမှုသမိုင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "869", "title": "မတေးဒါ", "author": "ရှင်မေယွန်း", "category": "ရသစာပေ", "year": "2006", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692055fef40bf.jpg", "rating": 4.5, "copies": 1, "desc": "မတေးဒါ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "2154", "title": "အခုချိန်ဆိုရှင်ဘယ်ရောက်နေမှာလဲနှင့် အခြားဝတ္ထုတိုများ", "author": "ဂျူး", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692bc3051e050.jpg", "rating": 4.9, "copies": 1, "desc": "အခုချိန်ဆိုရှင်ဘယ်ရောက်နေမှာလဲနှင့် အခြားဝတ္ထုတိုများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "1660", "title": "ကိုယ်ပိုင်အနာဂတ်", "author": "သုနေ", "category": "ရသစာပေ", "year": "2023", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6923cb9bdcaac.jpg", "rating": 4.5, "copies": 1, "desc": "ကိုယ်ပိုင်အနာဂတ် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "647", "title": "နောက်ဆုံးအဖြေ", "author": "တင်မြင့်", "category": "ရသစာပေ", "year": "2006", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6922af06998c0.jpg", "rating": 4.7, "copies": 1, "desc": "နောက်ဆုံးအဖြေ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "1424", "title": "အကြင်နာနှလုံးသားအလှများ", "author": "သိန်းဇော်", "category": "ရသစာပေ", "year": "2014", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_69242db1a4af3.jpg", "rating": 4.7, "copies": 1, "desc": "အကြင်နာနှလုံးသားအလှများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "660", "title": "ပဉ္ခမံဒီရိုင်း", "author": "ဘွာတေး", "category": "ရသစာပေ", "year": "2011", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692bc2bd7da69.jpg", "rating": 4.6, "copies": 1, "desc": "ပဉ္ခမံဒီရိုင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "1949", "title": "နားဝင်ပီယခလောက်သံနှင့် အခြားဝတ္ထုတိုများ", "author": "သောင်းမြင့်ဦး", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691ec704a6ad1.jpg", "rating": 4.7, "copies": 1, "desc": "နားဝင်ပီယခလောက်သံနှင့် အခြားဝတ္ထုတိုများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "1696", "title": "နပိုလီယွန်", "author": "ဦးသန်းထွန်း", "category": "ရသစာပေ", "year": "2011", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691d9cfd2c2a2.jpg", "rating": 4.6, "copies": 1, "desc": "နပိုလီယွန် စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "2209", "title": "ငွေတာရီ", "author": "ကလောင်စုံ", "category": "ရသစာပေ", "year": "2018", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6946213e75685.jpg", "rating": 4.8, "copies": 2, "desc": "ငွေတာရီ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "681", "title": "ပန်းခြွေတဲ့နွေနှင်းဝေတဲ့ဆောင်း", "author": "မောင်စိန်ဝင်း", "category": "ရသစာပေ", "year": "1999", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6919495bc0316.jpg", "rating": 4.6, "copies": 1, "desc": "ပန်းခြွေတဲ့နွေနှင်းဝေတဲ့ဆောင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "1715", "title": "ပြည်သူ့နီတိ(ပထမပိုင်း)", "author": "ဦးဘဖေ", "category": "ရသစာပေ", "year": "2014", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_68f6f70681eba.jpg", "rating": 4.4, "copies": 1, "desc": "ပြည်သူ့နီတိ(ပထမပိုင်း) စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "1719", "title": "ပုဂံသူရဲကောင်း", "author": "သော်တာဆွေ", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691ec729ae9dd.jpg", "rating": 4.8, "copies": 1, "desc": "ပုဂံသူရဲကောင်း စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "452", "title": "ညောင်ရွက်လေချီ", "author": "တက္ကသိုလ်တင်မြင့်", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692bc0cf077ca.jpg", "rating": 4.8, "copies": 1, "desc": "ညောင်ရွက်လေချီ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "1739", "title": "ဘဝကိုပြောင်းလဲစေသောအတွေးအခေါ်များ(၁)", "author": "ဒေါက်တာမြတ်ထွဋ်ညွန့်", "category": "ရသစာပေ", "year": "2018", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_691980faabbdd.jpg", "rating": 4.7, "copies": 1, "desc": "ဘဝကိုပြောင်းလဲစေသောအတွေးအခေါ်များ(၁) စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "1996", "title": "ဘဝတစ်ဆစ်ကြာတစ်ဆစ်နှင့် အခြားဝတ္ထုတိုများ", "author": "မကျေးဥ", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_692056bb676de.jpg", "rating": 4.5, "copies": 1, "desc": "ဘဝတစ်ဆစ်ကြာတစ်ဆစ်နှင့် အခြားဝတ္ထုတိုများ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "464", "title": "တစ်ဘဝကြေး", "author": "လွန်ထားထား", "category": "ရသစာပေ", "year": "2009", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6922aeda9bc39.jpg", "rating": 4.6, "copies": 1, "desc": "တစ်ဘဝကြေး စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "3536", "title": "ရွှေမန်းသားနှင့် လှတောသား", "author": "သိမ့်သိမ့်နွေး", "category": "ရသစာပေ", "year": "2022", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6938fe142db14.jpg", "rating": 4.5, "copies": 2, "desc": "ရွှေမန်းသားနှင့် လှတောသား စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "226", "title": "ချည်နှောင်ခဲ့သောခြေရာ", "author": "လမင်းမို့မို့", "category": "ရသစာပေ", "year": "2003", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_6919483daafaa.jpg", "rating": 4.6, "copies": 1, "desc": "ချည်နှောင်ခဲ့သောခြေရာ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}, {"id": "1791", "title": "လွတ်လပ်ရေးရပြီးခေတ်မြန်မာနိုင်ငံ၏ကာကွယ်ရေးဦးစီးချုပ်များ", "author": "နေစိုးထက်", "category": "ရသစာပေ", "year": "2017", "shelf": "စင်-A", "cover": "https://yomalibrary.kkkham.com/api/uploads/cover_68f6f63896f6f.jpg", "rating": 5.0, "copies": 1, "desc": "လွတ်လပ်ရေးရပြီးခေတ်မြန်မာနိုင်ငံ၏ကာကွယ်ရေးဦးစီးချုပ်များ စာအုပ် ဖြစ်ပါသည်။ စာကြည့်တိုက်တွင် ငှားရမ်းဖတ်ရှုနိုင်ပါသည်။"}];
+    let currentCategory = 'အားလုံး';
+    let searchQuery = '';
+
+    const categories = ['အားလုံး', 'ရသစာပေ', 'နည်းပညာ', 'သမိုင်း', 'ပညာရေး', 'အတွေးအခေါ်/စေ့ဆော်မှု'];
+
+    function init() {
+      renderCategories();
+      renderStories();
+      renderFeatured();
+      renderBooks();
+      lucide.createIcons();
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        document.getElementById('themeIcon').innerText = '🌙';
+      } else {
+        html.classList.add('dark');
+        document.getElementById('themeIcon').innerText = '☀️';
+      }
+    }
+
+    function setTab(tab) {
+      document.getElementById('homeSection').classList.toggle('hidden', tab !== 'home' && tab !== 'books');
+      document.getElementById('pubsSection').classList.toggle('hidden', tab !== 'pubs');
+      document.getElementById('donateSection').classList.toggle('hidden', tab !== 'donate');
+
+      ['Home', 'Books', 'Pubs', 'Donate'].forEach(t => {
+        const btn = document.getElementById('btnNav' + t);
+        if (btn) {
+          if (t.toLowerCase() === tab) {
+            btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-brand-600 text-white shadow-sm';
+          } else {
+            btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800';
+          }
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderCategories() {
+      const container = document.getElementById('categoryList');
+      const mobileContainer = document.getElementById('mobileCatPills');
+      container.innerHTML = '';
+      mobileContainer.innerHTML = '';
+
+      categories.forEach(cat => {
+        const count = cat === 'အားလုံး' ? allBooks.length : allBooks.filter(b => b.category.includes(cat)).length;
+        const btn = document.createElement('button');
+        btn.className = `flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-bold transition ${currentCategory === cat ? 'bg-brand-600 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}`;
+        btn.innerHTML = `<span>${cat}</span><span class="text-[10px] rounded-full px-2 py-0.5 ${currentCategory === cat ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800'}">${count}</span>`;
+        btn.onclick = () => selectCategory(cat);
+        container.appendChild(btn);
+
+        const mBtn = document.createElement('button');
+        mBtn.className = `shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${currentCategory === cat ? 'bg-brand-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`;
+        mBtn.innerText = cat;
+        mBtn.onclick = () => selectCategory(cat);
+        mobileContainer.appendChild(mBtn);
+      });
+    }
+
+    function selectCategory(cat) {
+      currentCategory = cat;
+      renderCategories();
+      renderBooks();
+    }
+
+    function onSearchInput(val) {
+      searchQuery = val.toLowerCase().trim();
+      document.getElementById('desktopSearch').value = val;
+      document.getElementById('mobileSearch').value = val;
+      renderBooks();
+    }
+
+    function renderStories() {
+      const container = document.getElementById('storiesBar');
+      container.innerHTML = '';
+      allBooks.slice(0, 8).forEach((b, i) => {
+        const div = document.createElement('div');
+        div.className = 'relative h-36 w-24 shrink-0 rounded-xl overflow-hidden cursor-pointer shadow-sm hover:scale-105 transition';
+        div.onclick = () => openModal(b);
+        div.innerHTML = `
+          <img src="${b.cover}" onerror="this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300'" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent"></div>
+          <span class="absolute bottom-2 left-2 text-[11px] font-bold text-white line-clamp-1 drop-shadow">${b.title}</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderFeatured() {
+      const container = document.getElementById('featuredRow');
+      container.innerHTML = '';
+      allBooks.slice(0, 10).forEach(b => {
+        const div = document.createElement('div');
+        div.className = 'w-28 shrink-0 cursor-pointer space-y-1.5 hover:scale-102 transition';
+        div.onclick = () => openModal(b);
+        div.innerHTML = `
+          <div class="aspect-[2/3] w-full rounded-xl overflow-hidden shadow-sm bg-slate-200 dark:bg-slate-800">
+            <img src="${b.cover}" onerror="this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300'" class="w-full h-full object-cover" />
+          </div>
+          <p class="text-xs font-bold line-clamp-1">${b.title}</p>
+          <p class="text-[11px] text-slate-500 line-clamp-1">${b.author}</p>
+          <p class="text-[10px] text-amber-500 font-bold">★ ${b.rating}</p>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderBooks() {
+      const grid = document.getElementById('booksGrid');
+      grid.innerHTML = '';
+
+      const filtered = allBooks.filter(b => {
+        const matchCat = currentCategory === 'အားလုံး' || b.category.includes(currentCategory);
+        const matchQ = !searchQuery || b.title.toLowerCase().includes(searchQuery) || b.author.toLowerCase().includes(searchQuery) || b.shelf.toLowerCase().includes(searchQuery);
+        return matchCat && matchQ;
+      });
+
+      document.getElementById('bookCountLabel').innerText = `ရလဒ် (${filtered.length}) အုပ်`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="col-span-full py-12 text-center text-sm text-slate-400">ရှာမတွေ့ပါ</div>';
+        return;
+      }
+
+      filtered.forEach(b => {
+        const card = document.createElement('div');
+        card.className = 'group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 shadow-sm hover:shadow-md hover:border-brand-500/50 cursor-pointer transition flex flex-col justify-between';
+        card.onclick = () => openModal(b);
+        card.innerHTML = `
+          <div>
+            <div class="aspect-[2/3] w-full rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-800 shadow-sm">
+              <img src="${b.cover}" onerror="this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+            </div>
+            <div class="mt-2 space-y-1">
+              <span class="text-[10px] font-bold text-brand-600 dark:text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded">${b.category}</span>
+              <h3 class="text-xs font-bold line-clamp-1 group-hover:text-brand-600 transition">${b.title}</h3>
+              <p class="text-[11px] text-slate-500 line-clamp-1">${b.author}</p>
+            </div>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between text-[10px] text-slate-500">
+            <span class="text-amber-500 font-bold">★ ${b.rating}</span>
+            <span>${b.shelf}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function openModal(b) {
+      document.getElementById('modalCover').src = b.cover;
+      document.getElementById('modalTitle').innerText = b.title;
+      document.getElementById('modalAuthor').innerText = b.author;
+      document.getElementById('modalCategory').innerText = b.category;
+      document.getElementById('modalYear').innerText = 'ထုတ်ဝေခုနှစ် - ' + b.year;
+      document.getElementById('modalShelf').innerText = 'စာအုပ်စင် - ' + b.shelf;
+      document.getElementById('modalCopies').innerText = '● ရရှိနိုင်သည့် အုပ်ရေ (' + b.copies + ') အုပ်';
+      document.getElementById('modalRating').innerText = '★ ' + b.rating + ' / 5.0';
+      document.getElementById('modalDesc').innerText = b.desc;
+      document.getElementById('bookModal').classList.remove('hidden');
+      document.getElementById('bookModal').classList.add('flex');
+    }
+
+    function closeModal() {
+      document.getElementById('bookModal').classList.add('hidden');
+      document.getElementById('bookModal').classList.remove('flex');
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
