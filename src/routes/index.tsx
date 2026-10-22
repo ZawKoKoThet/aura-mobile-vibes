@@ -41,7 +41,7 @@ function BookCover({
   className = "",
 }: {
   title: string;
-  cover?: string;
+  cover?: string | undefined;
   i?: number;
   className?: string;
 }) {
