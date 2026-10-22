@@ -3,19 +3,20 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import {
   Home, Newspaper, BookOpen, Gift, Menu, Search, Sun, Moon, X, Flame, Clock,
   Cpu, Shield, Users, Tags, BookMarked, Bookmark, Heart, MessageCircle, Share2,
-  Send, Sparkles, Library, ChevronRight, Star, CheckCircle, Info, ExternalLink
+  Send, Sparkles, Library, ChevronRight, Star, CheckCircle, Info, Grid, List,
+  BookCheck, Calendar, MapPin
 } from "lucide-react";
 import { libraryBooks, BookItem } from "../data/books";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "OCDI Library — စာကြည့်တိုက်" },
-      { name: "description", content: "Browse books, newspapers, journals and e-books from the OCDI Library." },
+      { title: "OCDI Library — စာကြည့်တိုက် စီမံခန့်ခွဲမှုစနစ်" },
+      { name: "description", content: "OCDI Digital Library - Browse books, newspapers, journals and e-books." },
       { property: "og:title", content: "OCDI Library — စာကြည့်တိုက်" },
       { property: "og:description", content: "Browse books, newspapers, journals and e-books from the OCDI Library." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
@@ -50,28 +51,28 @@ function BookCover({
 
   if (cover && !imgError) {
     return (
-      <div className={`relative overflow-hidden rounded-lg bg-muted shadow-sm transition-transform duration-200 ${className}`}>
+      <div className={`relative overflow-hidden rounded-xl bg-muted shadow-sm transition-all duration-300 group-hover:scale-102 ${className}`}>
         <img
           src={cover}
           alt={title}
           loading="lazy"
           onError={() => setImgError(true)}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover transition-transform duration-300"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity hover:opacity-100" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
       </div>
     );
   }
 
   return (
     <div
-      className={`relative flex items-end overflow-hidden rounded-lg p-2 ${className}`}
+      className={`relative flex items-end overflow-hidden rounded-xl p-3 shadow-sm ${className}`}
       style={{
         background: `linear-gradient(150deg, oklch(0.62 0.13 ${h}), oklch(0.32 0.08 ${h + 30}))`,
       }}
     >
-      <div className="absolute left-1.5 top-0 h-full w-px bg-background/30" />
-      <span className="line-clamp-3 text-[11px] font-bold leading-snug text-primary-foreground drop-shadow">
+      <div className="absolute left-2 top-0 h-full w-1 bg-white/20" />
+      <span className="line-clamp-3 text-xs font-bold leading-snug text-white drop-shadow">
         {title}
       </span>
     </div>
@@ -191,31 +192,76 @@ function Index() {
   ];
 
   return (
-    <div className="mx-auto min-h-screen max-w-lg bg-muted/40 pb-20">
-      {/* Top Header */}
+    <div className="min-h-screen bg-muted/30 text-foreground transition-colors">
+      {/* Top Main Navigation Bar (Desktop & Mobile) */}
       <header className="glass sticky top-0 z-30 border-b border-border">
-        <div className="flex h-14 items-center gap-2 px-3">
-          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
-            <Library className="h-5 w-5" />
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-3 sm:px-6 lg:px-8">
+          {/* Logo & Brand */}
+          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => { setTab("home"); setSearchQuery(""); }}>
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow">
+              <Library className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-lg font-black tracking-tight text-primary">OCDI Library</h1>
+              <p className="text-[10px] text-muted-foreground hidden sm:block">စာကြည့်တိုက် စီမံခန့်ခွဲမှုစနစ် · Digital Catalog</p>
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <h1 className="truncate text-lg font-extrabold tracking-tight text-primary">OCDI Library</h1>
-            <p className="text-[10px] text-muted-foreground truncate">စာကြည့်တိုက် စီမံခန့်ခွဲမှုစနစ်</p>
+
+          {/* Desktop Search Bar */}
+          <div className="hidden md:flex flex-1 max-w-md items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 shadow-sm focus-within:ring-2 focus-within:ring-primary/40">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="စာအုပ်အမည်၊ စာရေးဆရာ၊ စင်နံပါတ် ရှာဖွေပါ..."
+              className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} className="text-muted-foreground hover:text-foreground">
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
-          <button
-            aria-label="Toggle theme"
-            onClick={() => setDark(!dark)}
-            className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-secondary-foreground active:scale-95 transition"
-          >
-            {dark ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
-          </button>
-          <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/20 text-sm font-bold text-primary">
-            OC
+
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1.5">
+            {navTabs.filter((t) => t.id !== "menu").map(({ id, icon: Icon, l }) => {
+              const active = tab === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setTab(id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                    active
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{l}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Right Action Icons */}
+          <div className="flex items-center gap-2">
+            <button
+              aria-label="Toggle theme"
+              onClick={() => setDark(!dark)}
+              className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 active:scale-95 transition"
+            >
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/20 text-xs font-bold text-primary">
+              OC
+            </div>
           </div>
         </div>
 
-        {/* Quick Search Bar */}
-        <div className="px-3 pb-2 pt-1">
+        {/* Mobile Quick Search Bar */}
+        <div className="md:hidden px-3 pb-2 pt-0.5">
           <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 shadow-sm focus-within:ring-2 focus-within:ring-primary/40">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
@@ -233,8 +279,8 @@ function Index() {
           </div>
         </div>
 
-        {/* Categories Bar */}
-        <nav className="no-scrollbar flex gap-1.5 overflow-x-auto px-3 pb-2">
+        {/* Mobile Categories Scrollbar */}
+        <div className="lg:hidden no-scrollbar flex gap-1.5 overflow-x-auto px-3 pb-2.5">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -248,372 +294,395 @@ function Index() {
               {cat}
             </button>
           ))}
-        </nav>
+        </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="space-y-3 pt-2">
-        {/* If Search is Active, Show Search Results directly */}
-        {searchQuery.trim() !== "" ? (
-          <section className="bg-card px-3 py-3">
-            <div className="flex items-center justify-between pb-3">
-              <h2 className="text-[14px] font-bold">ရှာဖွေတွေ့ရှိချက်များ ({filteredBooks.length})</h2>
-              <button onClick={() => setSearchQuery("")} className="text-xs text-primary font-semibold">
-                ရှင်းလင်းမည်
-              </button>
-            </div>
-            {filteredBooks.length === 0 ? (
-              <div className="py-12 text-center text-sm text-muted-foreground">
-                "{searchQuery}" နှင့် ကိုက်ညီသော စာအုပ် မတွေ့ရှိပါ။
+      {/* Main Container Layout */}
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 pt-4 pb-24 lg:pb-12">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* DESKTOP SIDEBAR (Visible on Desktop) */}
+          <aside className="hidden lg:block w-64 shrink-0 space-y-4">
+            {/* Library Quick Stats Box */}
+            <div className="rounded-2xl border border-border bg-card p-4 space-y-3 shadow-sm">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">စာကြည့်တိုက် အချက်အလက်</h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-xl bg-muted/60 p-2.5 text-center">
+                  <div className="text-base font-extrabold text-primary">{libraryBooks.length}+</div>
+                  <div className="text-[10px] text-muted-foreground font-semibold">ကာဗာပါ စာအုပ်</div>
+                </div>
+                <div className="rounded-xl bg-muted/60 p-2.5 text-center">
+                  <div className="text-base font-extrabold text-foreground">3,892</div>
+                  <div className="text-[10px] text-muted-foreground font-semibold">စာရင်းသွင်း</div>
+                </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {filteredBooks.map((b, i) => (
-                  <div
-                    key={b.id}
-                    onClick={() => setSelectedBook(b)}
-                    className="cursor-pointer overflow-hidden rounded-xl border border-border bg-card p-2 shadow-sm transition hover:shadow-md"
-                  >
-                    <BookCover
-                      title={b.title}
-                      cover={b.cover}
-                      i={i}
-                      className="aspect-[2/3] w-full rounded-lg"
-                    />
-                    <div className="mt-2 space-y-0.5">
-                      <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-                        {b.category}
-                      </span>
-                      <p className="line-clamp-1 text-xs font-bold">{b.title}</p>
-                      <p className="line-clamp-1 text-[11px] text-muted-foreground">{b.author}</p>
-                      <div className="flex items-center justify-between pt-1 text-[10px] text-muted-foreground">
-                        <span className="flex items-center gap-0.5 text-accent font-semibold">
-                          <Star className="h-3 w-3 fill-current" /> {b.rating}
-                        </span>
-                        <span>{b.shelf}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-        ) : tab === "books" ? (
-          /* ALL BOOKS TAB */
-          <section className="bg-card px-3 py-3">
-            <div className="flex items-center justify-between pb-3">
-              <div>
-                <h2 className="text-[16px] font-extrabold text-foreground">စာအုပ်များ စုစည်းမှု</h2>
-                <p className="text-xs text-muted-foreground">စုစုပေါင်း {filteredBooks.length} အုပ်</p>
+              <div className="text-xs text-muted-foreground pt-1 flex items-center justify-between border-t border-border/60">
+                <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> ဖွင့်ချိန်</span>
+                <span className="font-bold text-foreground">08:30 – 16:30</span>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {filteredBooks.map((b, i) => (
-                <div
-                  key={b.id}
-                  onClick={() => setSelectedBook(b)}
-                  className="cursor-pointer overflow-hidden rounded-xl border border-border bg-card p-2 shadow-sm transition hover:shadow-md active:scale-98"
-                >
-                  <BookCover
-                    title={b.title}
-                    cover={b.cover}
-                    i={i}
-                    className="aspect-[2/3] w-full rounded-lg"
-                  />
-                  <div className="mt-2 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-                        {b.category}
-                      </span>
-                      <span className="text-[10px] font-bold text-success">● {b.copies} အုပ်</span>
-                    </div>
-                    <p className="line-clamp-1 text-xs font-bold text-foreground">{b.title}</p>
-                    <p className="line-clamp-1 text-[11px] text-muted-foreground">{b.author}</p>
-                    <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-                      <span className="flex items-center gap-0.5 text-accent font-semibold">
-                        <Star className="h-3 w-3 fill-current" /> {b.rating}
-                      </span>
-                      <span>{b.shelf}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        ) : tab === "pubs" ? (
-          /* NEWSPAPERS TAB */
-          <section className="bg-card px-3 py-4 space-y-4">
-            <h2 className="text-[16px] font-extrabold">နေ့စဉ်သတင်းစာများနှင့် ဂျာနယ်များ</h2>
-            <div className="flex gap-1.5 rounded-lg bg-muted p-1">
-              {papers.map((p, i) => (
-                <button
-                  key={p}
-                  onClick={() => setPaper(i)}
-                  className={`flex-1 rounded-md py-2 text-xs font-bold leading-relaxed transition ${
-                    paper === i ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-            <div className="flex flex-col gap-3 rounded-xl border border-border p-3 bg-muted/30">
-              <div className="flex items-center gap-3">
-                <div className="grid h-16 w-14 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
-                  <Newspaper className="h-8 w-8" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold leading-relaxed">{papers[paper]} — ယနေ့ထုတ် သတင်းစာ</p>
-                  <p className="text-xs text-muted-foreground">23 October 2026 · PDF ထုတ်ဝေမှု · စာမျက်နှာ ၂၄ မျက်နှာ</p>
-                  <span className="mt-1 inline-block rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success">
-                    အွန်လိုင်းတွင် ဖတ်ရှုနိုင်ပါသည်
-                  </span>
-                </div>
-              </div>
-              <button className="w-full rounded-lg bg-primary py-2.5 text-xs font-bold text-primary-foreground shadow transition active:scale-95">
-                သတင်းစာ အပြည့်အစုံ ဖတ်ရှုမည် (PDF)
-              </button>
-            </div>
-          </section>
-        ) : tab === "donate" ? (
-          /* DONATE TAB */
-          <section className="bg-card px-4 py-5 space-y-4">
-            <div className="text-center space-y-2">
-              <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-accent/20 text-accent">
-                <Gift className="h-6 w-6" />
-              </div>
-              <h2 className="text-lg font-bold">စာအုပ်နှင့် စာကြည့်တိုက် ရန်ပုံငွေ လှူဒါန်းရန်</h2>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                OCDI စာကြည့်တိုက် ဖွံ့ဖြိုးတိုးတက်ရေးနှင့် စာဖတ်ပရိသတ်များ ဗဟုသုတရရှိရေးအတွက် စာအုပ်များ၊ သုတရသစာပေများကို လှူဒါန်းနိုင်ပါသည်။
-              </p>
-            </div>
-            <div className="rounded-xl border border-border p-3 space-y-2 bg-muted/20">
-              <p className="text-xs font-bold">လှူဒါန်းနိုင်သည့် အမျိုးအစားများ -</p>
-              <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1">
-                <li>သုတ၊ ရသ စာအုပ်အသစ်နှင့် အဟောင်းများ</li>
-                <li>အင်ဂျင်နီယာနှင့် နည်းပညာ သင်ရိုးစာအုပ်များ</li>
-                <li>မဂ္ဂဇင်း၊ ဂျာနယ်နှင့် သမိုင်းမှတ်တမ်းများ</li>
-                <li>E-Books နှင့် Digital Resources များ</li>
-              </ul>
-            </div>
-            <button className="w-full rounded-xl bg-primary py-2.5 text-xs font-bold text-primary-foreground">
-              လှူဒါန်းရန် ဆက်သွယ်စုံစမ်းမည်
-            </button>
-          </section>
-        ) : (
-          /* HOME TAB */
-          <>
-            {/* Stories / Categories */}
-            <section className="no-scrollbar flex gap-2.5 overflow-x-auto bg-card px-3 py-3">
-              {stories.map(({ name, icon: Icon }, i) => (
-                <div
-                  key={name}
-                  onClick={() => {
-                    if (name === "E-Books" || name === "Popular") setTab("books");
-                    if (name === "Journals") setTab("pubs");
-                  }}
-                  className="relative h-36 w-24 shrink-0 cursor-pointer overflow-hidden rounded-xl border border-border/60 transition hover:scale-102"
-                >
-                  <BookCover
-                    title=""
-                    cover={libraryBooks[i]?.cover}
-                    i={i + 2}
-                    className="h-full w-full"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  <div className="absolute left-2 top-2 grid h-7 w-7 place-items-center rounded-full border border-primary/50 bg-card text-primary shadow">
-                    <Icon className="h-3.5 w-3.5" />
-                  </div>
-                  <span className="absolute bottom-2 left-2 text-xs font-bold text-white drop-shadow">
-                    {name}
-                  </span>
-                </div>
-              ))}
-            </section>
 
-            {/* Quick Stats */}
-            <section className="grid grid-cols-3 gap-px overflow-hidden bg-border">
-              {[
-                [`${libraryBooks.length}+`, "စုစုပေါင်းစာအုပ်"],
-                ["3,892", "ကတ်တလောက်"],
-                ["08:30–16:30", "ဖွင့်ချိန်"],
-              ].map(([n, l]) => (
-                <div key={l} className="bg-card px-2 py-3 text-center">
-                  <div className="text-sm font-extrabold text-foreground">{n}</div>
-                  <div className="text-[11px] text-muted-foreground">{l}</div>
-                </div>
-              ))}
-            </section>
-
-            {/* Featured Books Carousel */}
-            <section className="bg-card py-3">
-              <div className="flex items-center justify-between px-3 pb-2">
-                <div>
-                  <h2 className="text-[15px] font-bold">အထူးအကြံပြု စာအုပ်များ (Featured)</h2>
-                  <p className="text-[11px] text-muted-foreground">ကာဗာဓာတ်ပုံပါ စာအုပ်များ</p>
-                </div>
-                <button
-                  onClick={() => setTab("books")}
-                  className="flex items-center text-xs font-semibold text-primary"
-                >
-                  အားလုံးကြည့် <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-              <div className="no-scrollbar flex gap-3 overflow-x-auto px-3">
-                {libraryBooks.slice(0, 10).map((b, i) => (
-                  <div
-                    key={b.id}
-                    onClick={() => setSelectedBook(b)}
-                    className="w-28 shrink-0 cursor-pointer transition active:scale-95"
-                  >
-                    <BookCover
-                      title={b.title}
-                      cover={b.cover}
-                      i={i}
-                      className="aspect-[2/3] w-full rounded-lg shadow-sm"
-                    />
-                    <p className="mt-1.5 line-clamp-1 text-xs font-bold leading-snug">{b.title}</p>
-                    <p className="line-clamp-1 text-[11px] text-muted-foreground">{b.author}</p>
-                    <p className="flex items-center gap-1 text-[10px] text-accent font-bold">
-                      <Star className="h-3 w-3 fill-current" /> {b.rating}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Daily Newspapers Quick Card */}
-            <section className="bg-card px-3 py-3">
-              <div className="flex items-center justify-between pb-2">
-                <h2 className="text-[15px] font-bold">နေ့စဉ်သတင်းစာ</h2>
-                <button onClick={() => setTab("pubs")} className="text-xs font-semibold text-primary">
-                  ဖတ်ရှုရန်
-                </button>
-              </div>
-              <div className="flex gap-1 rounded-lg bg-muted p-1">
-                {papers.map((p, i) => (
-                  <button
-                    key={p}
-                    onClick={() => setPaper(i)}
-                    className={`flex-1 rounded-md py-1.5 text-xs font-semibold transition ${
-                      paper === i ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
-              <div className="mt-3 flex items-center gap-3 rounded-lg border border-border p-2">
-                <div className="grid h-14 w-12 place-items-center rounded bg-secondary">
-                  <Newspaper className="h-6 w-6 text-muted-foreground" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold leading-relaxed">{papers[paper]} — ယနေ့ထုတ်</p>
-                  <p className="text-[11px] text-muted-foreground">PDF ထုတ်ဝေမှု · စာမျက်နှာ ၂၄ မျက်နှာ</p>
-                </div>
-                <button
-                  onClick={() => setTab("pubs")}
-                  className="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground"
-                >
-                  ဖတ်မည်
-                </button>
-              </div>
-            </section>
-
-            {/* Social Feed of New Arrivals */}
-            <section className="space-y-2">
-              <div className="px-3 pt-2">
-                <h2 className="text-[15px] font-bold">စာကြည့်တိုက် အသစ်ရောက်စာအုပ်များ</h2>
-              </div>
-              {libraryBooks.slice(0, 6).map((b, i) => (
-                <article key={b.id} className="bg-card border-b border-border/40">
-                  <div className="flex items-center gap-2 px-3 pt-3">
-                    <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/15 text-primary">
-                      <Library className="h-4 w-4" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-bold leading-tight">OCDI Library</p>
-                      <p className="text-[11px] text-muted-foreground">{i + 1} ရက်အလို · အသစ်ရောက် · {b.category}</p>
-                    </div>
-                    <button onClick={() => toggleSave(b.id)}>
-                      <Bookmark
-                        className={`h-5 w-5 transition ${
-                          savedBooks[b.id] ? "fill-primary text-primary" : "text-muted-foreground"
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  <p className="px-3 py-2 text-sm leading-relaxed">
-                    စာအုပ်အသစ် ရောက်ရှိပါပြီ — <b className="text-foreground">{b.title}</b> ရေးသားသူ ({b.author})
-                  </p>
-
-                  <div
-                    onClick={() => setSelectedBook(b)}
-                    className="flex cursor-pointer gap-3 bg-muted/40 p-3 transition hover:bg-muted/60"
-                  >
-                    <BookCover
-                      title={b.title}
-                      cover={b.cover}
-                      i={i + 3}
-                      className="aspect-[2/3] w-24 shrink-0 rounded-lg shadow"
-                    />
-                    <div className="flex min-w-0 flex-col justify-center gap-1.5">
-                      <span className="w-fit rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">
-                        {b.category}
-                      </span>
-                      <p className="text-sm font-bold leading-snug">{b.title}</p>
-                      <p className="text-xs text-muted-foreground">{b.author}</p>
-                      <p className="text-[11px] text-muted-foreground">နေရာ - {b.shelf}</p>
-                      <p className="flex items-center gap-1 text-xs text-accent font-bold">
-                        <Star className="h-3.5 w-3.5 fill-current" /> {b.rating}
-                      </p>
-                      <span className="text-[11px] font-semibold text-success">● ရရှိနိုင်သည် ({b.copies} အုပ်)</span>
-                    </div>
-                  </div>
-
-                  <div className="flex border-t border-border text-xs font-semibold text-muted-foreground">
+            {/* Desktop Categories Filter */}
+            <div className="rounded-2xl border border-border bg-card p-4 space-y-2 shadow-sm">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">ကဏ္ဍများ (Categories)</h3>
+              <div className="space-y-1">
+                {categories.map((cat) => {
+                  const count =
+                    cat === "အားလုံး"
+                      ? libraryBooks.length
+                      : libraryBooks.filter((b) => b.category.includes(cat)).length;
+                  return (
                     <button
-                      onClick={() => toggleLike(b.id)}
-                      className={`flex flex-1 items-center justify-center gap-1.5 py-2.5 active:bg-muted transition ${
-                        likedBooks[b.id] ? "text-red-500" : ""
+                      key={cat}
+                      onClick={() => setActiveCategory(cat)}
+                      className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-bold transition ${
+                        activeCategory === cat
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                     >
-                      <Heart className={`h-4 w-4 ${likedBooks[b.id] ? "fill-red-500" : ""}`} />
-                      {likedBooks[b.id] ? "သဘောကျသည်" : "Like"}
+                      <span>{cat}</span>
+                      <span
+                        className={`text-[10px] rounded-full px-2 py-0.5 font-semibold ${
+                          activeCategory === cat ? "bg-white/20 text-white" : "bg-muted text-foreground"
+                        }`}
+                      >
+                        {count}
+                      </span>
                     </button>
-                    <button
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Daily Newspapers Quick Box */}
+            <div className="rounded-2xl border border-border bg-card p-4 space-y-2.5 shadow-sm">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">ယနေ့ထုတ် သတင်းစာ</h3>
+              <p className="text-xs font-bold text-foreground">{papers[paper]} — သတင်းစာ</p>
+              <p className="text-[11px] text-muted-foreground">PDF ဗားရှင်းကို အွန်လိုင်းတွင် အခမဲ့ ဖတ်ရှုနိုင်ပါသည်။</p>
+              <button
+                onClick={() => setTab("pubs")}
+                className="w-full rounded-xl bg-primary/10 py-2 text-xs font-bold text-primary hover:bg-primary hover:text-primary-foreground transition"
+              >
+                သတင်းစာများ ဖတ်မည်
+              </button>
+            </div>
+          </aside>
+
+          {/* MAIN CONTENT AREA */}
+          <main className="flex-1 min-w-0 space-y-5">
+            {/* If Search Active, Show Results */}
+            {searchQuery.trim() !== "" ? (
+              <section className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                <div className="flex items-center justify-between pb-4 border-b border-border/60">
+                  <div>
+                    <h2 className="text-base font-extrabold text-foreground">ရှာဖွေတွေ့ရှိချက်များ</h2>
+                    <p className="text-xs text-muted-foreground">"{searchQuery}" နှင့် ကိုက်ညီသော စာအုပ် ({filteredBooks.length}) အုပ်</p>
+                  </div>
+                  <button onClick={() => setSearchQuery("")} className="text-xs text-primary font-bold hover:underline">
+                    ရှင်းလင်းမည်
+                  </button>
+                </div>
+
+                {filteredBooks.length === 0 ? (
+                  <div className="py-16 text-center text-sm text-muted-foreground">
+                    "{searchQuery}" နှင့် ကိုက်ညီသော စာအုပ် မတွေ့ရှိသေးပါ။
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 pt-4">
+                    {filteredBooks.map((b, i) => (
+                      <div
+                        key={b.id}
+                        onClick={() => setSelectedBook(b)}
+                        className="group cursor-pointer overflow-hidden rounded-xl border border-border bg-card p-2.5 shadow-sm transition hover:shadow-md hover:border-primary/50"
+                      >
+                        <BookCover
+                          title={b.title}
+                          cover={b.cover}
+                          i={i}
+                          className="aspect-[2/3] w-full rounded-lg"
+                        />
+                        <div className="mt-2 space-y-1">
+                          <span className="inline-block rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                            {b.category}
+                          </span>
+                          <p className="line-clamp-1 text-xs font-bold group-hover:text-primary transition">{b.title}</p>
+                          <p className="line-clamp-1 text-[11px] text-muted-foreground">{b.author}</p>
+                          <div className="flex items-center justify-between pt-1 text-[10px] text-muted-foreground">
+                            <span className="flex items-center gap-0.5 text-accent font-bold">
+                              <Star className="h-3 w-3 fill-current" /> {b.rating}
+                            </span>
+                            <span>{b.shelf}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            ) : tab === "books" ? (
+              /* ALL BOOKS FULL GRID VIEW */
+              <section className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-border/60">
+                  <div>
+                    <h2 className="text-lg font-black text-foreground">စာအုပ်များ စုစည်းမှု (All Books)</h2>
+                    <p className="text-xs text-muted-foreground">ကာဗာဓာတ်ပုံပါရှိသော စာအုပ် စုစုပေါင်း ({filteredBooks.length}) အုပ်</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">ကဏ္ဍ -</span>
+                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                      {activeCategory}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
+                  {filteredBooks.map((b, i) => (
+                    <div
+                      key={b.id}
                       onClick={() => setSelectedBook(b)}
-                      className="flex flex-1 items-center justify-center gap-1.5 py-2.5 active:bg-muted"
+                      className="group cursor-pointer overflow-hidden rounded-xl border border-border bg-card p-2.5 shadow-sm transition hover:shadow-md hover:border-primary/50"
                     >
-                      <MessageCircle className="h-4 w-4" /> အသေးစိတ်
-                    </button>
+                      <BookCover
+                        title={b.title}
+                        cover={b.cover}
+                        i={i}
+                        className="aspect-[2/3] w-full rounded-lg"
+                      />
+                      <div className="mt-2.5 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+                            {b.category}
+                          </span>
+                          <span className="text-[10px] font-bold text-success">● {b.copies} အုပ်</span>
+                        </div>
+                        <p className="line-clamp-1 text-xs font-bold text-foreground group-hover:text-primary transition">{b.title}</p>
+                        <p className="line-clamp-1 text-[11px] text-muted-foreground">{b.author}</p>
+                        <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-0.5">
+                          <span className="flex items-center gap-0.5 text-accent font-bold">
+                            <Star className="h-3 w-3 fill-current" /> {b.rating}
+                          </span>
+                          <span className="font-medium">{b.shelf}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : tab === "pubs" ? (
+              /* NEWSPAPERS SECTION */
+              <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm space-y-4">
+                <div className="border-b border-border/60 pb-3">
+                  <h2 className="text-lg font-black text-foreground">နေ့စဉ်သတင်းစာများနှင့် ဂျာနယ်များ</h2>
+                  <p className="text-xs text-muted-foreground">ယနေ့ထုတ် သတင်းစာများကို PDF ဖြင့် အခမဲ့ ဖတ်ရှုနိုင်ပါသည်</p>
+                </div>
+
+                <div className="flex gap-2 rounded-xl bg-muted p-1.5 max-w-lg">
+                  {papers.map((p, i) => (
                     <button
-                      onClick={() => {
-                        if (navigator.share) {
-                          navigator.share({ title: b.title, text: `${b.title} by ${b.author}` });
-                        }
-                      }}
-                      className="flex flex-1 items-center justify-center gap-1.5 py-2.5 active:bg-muted"
+                      key={p}
+                      onClick={() => setPaper(i)}
+                      className={`flex-1 rounded-lg py-2 text-xs font-bold transition ${
+                        paper === i ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
+                      }`}
                     >
-                      <Share2 className="h-4 w-4" /> မျှဝေမည်
+                      {p}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4 rounded-2xl border border-border p-4 bg-muted/20">
+                  <div className="grid h-24 w-20 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                    <Newspaper className="h-10 w-10" />
+                  </div>
+                  <div className="min-w-0 flex-1 space-y-1 text-center sm:text-left">
+                    <p className="text-base font-extrabold">{papers[paper]} — ယနေ့ထုတ် သတင်းစာ</p>
+                    <p className="text-xs text-muted-foreground">23 October 2026 · PDF ထုတ်ဝေမှု · စာမျက်နှာ ၂၄ မျက်နှာ</p>
+                    <span className="inline-block rounded-full bg-success/15 px-2.5 py-0.5 text-[11px] font-bold text-success">
+                      ● အွန်လိုင်းတွင် ဖတ်ရှုနိုင်ပါသည်
+                    </span>
+                  </div>
+                  <button className="w-full sm:w-auto rounded-xl bg-primary px-5 py-3 text-xs font-bold text-primary-foreground shadow transition active:scale-95">
+                    သတင်းစာ ဖတ်ရှုမည် (PDF)
+                  </button>
+                </div>
+              </section>
+            ) : tab === "donate" ? (
+              /* DONATE SECTION */
+              <section className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-5 max-w-2xl mx-auto">
+                <div className="text-center space-y-2">
+                  <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent/20 text-accent">
+                    <Gift className="h-7 w-7" />
+                  </div>
+                  <h2 className="text-xl font-black">စာအုပ်နှင့် စာကြည့်တိုက် ရန်ပုံငွေ လှူဒါန်းရန်</h2>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    OCDI စာကြည့်တိုက် ဖွံ့ဖြိုးတိုးတက်ရေးနှင့် စာဖတ်ပရိသတ်များ ဗဟုသုတရရှိရေးအတွက် စာအုပ်များ၊ သုတရသစာပေများကို လှူဒါန်းနိုင်ပါသည်။
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-border p-4 space-y-2.5 bg-muted/30">
+                  <p className="text-xs font-bold text-foreground">လှူဒါန်းနိုင်သည့် စာအုပ် အမျိုးအစားများ -</p>
+                  <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1.5 leading-relaxed">
+                    <li>သုတ၊ ရသ စာအုပ်အသစ်နှင့် အဟောင်းများ</li>
+                    <li>အင်ဂျင်နီယာနှင့် နည်းပညာ သင်ရိုးစာအုပ်များ</li>
+                    <li>မဂ္ဂဇင်း၊ ဂျာနယ်နှင့် သမိုင်းမှတ်တမ်းများ</li>
+                    <li>E-Books နှင့် Digital Resources များ</li>
+                  </ul>
+                </div>
+                <button className="w-full rounded-xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow">
+                  လှူဒါန်းရန် ဆက်သွယ်စုံစမ်းမည်
+                </button>
+              </section>
+            ) : (
+              /* HOME TAB */
+              <>
+                {/* Hero / Stories Carousel */}
+                <section className="no-scrollbar flex gap-3 overflow-x-auto rounded-2xl border border-border bg-card p-3 shadow-sm">
+                  {stories.map(({ name, icon: Icon }, i) => (
+                    <div
+                      key={name}
+                      onClick={() => {
+                        if (name === "E-Books" || name === "Popular") setTab("books");
+                        if (name === "Journals") setTab("pubs");
+                      }}
+                      className="group relative h-40 w-28 shrink-0 cursor-pointer overflow-hidden rounded-xl border border-border transition hover:scale-102"
+                    >
+                      <BookCover
+                        title=""
+                        cover={libraryBooks[i]?.cover}
+                        i={i + 2}
+                        className="h-full w-full"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                      <div className="absolute left-2.5 top-2.5 grid h-7 w-7 place-items-center rounded-full border border-primary/50 bg-card text-primary shadow">
+                        <Icon className="h-3.5 w-3.5" />
+                      </div>
+                      <span className="absolute bottom-2.5 left-2.5 text-xs font-bold text-white drop-shadow">
+                        {name}
+                      </span>
+                    </div>
+                  ))}
+                </section>
+
+                {/* Featured Books Row */}
+                <section className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-border/60">
+                    <div>
+                      <h2 className="text-base font-extrabold text-foreground">အထူးအကြံပြု စာအုပ်များ (Featured Books)</h2>
+                      <p className="text-xs text-muted-foreground">ကာဗာဓာတ်ပုံပါ စာအုပ်သစ်များ</p>
+                    </div>
+                    <button
+                      onClick={() => setTab("books")}
+                      className="flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+                    >
+                      အားလုံးကြည့် <ChevronRight className="h-4 w-4" />
                     </button>
                   </div>
-                </article>
-              ))}
-            </section>
-          </>
-        )}
 
-        <footer className="px-3 py-6 text-center text-[11px] leading-relaxed text-muted-foreground">
-          © 2026 OCDI Library Management System · All Rights Reserved
-        </footer>
-      </main>
+                  <div className="no-scrollbar flex gap-3.5 overflow-x-auto py-1">
+                    {libraryBooks.slice(0, 10).map((b, i) => (
+                      <div
+                        key={b.id}
+                        onClick={() => setSelectedBook(b)}
+                        className="group w-32 shrink-0 cursor-pointer transition active:scale-95"
+                      >
+                        <BookCover
+                          title={b.title}
+                          cover={b.cover}
+                          i={i}
+                          className="aspect-[2/3] w-full rounded-xl shadow"
+                        />
+                        <p className="mt-2 line-clamp-1 text-xs font-bold leading-snug group-hover:text-primary transition">{b.title}</p>
+                        <p className="line-clamp-1 text-[11px] text-muted-foreground">{b.author}</p>
+                        <p className="flex items-center gap-1 text-[10px] text-accent font-bold pt-0.5">
+                          <Star className="h-3 w-3 fill-current" /> {b.rating}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Feed of Arrivals */}
+                <section className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm space-y-4">
+                  <div className="border-b border-border/60 pb-3">
+                    <h2 className="text-base font-extrabold text-foreground">စာကြည့်တိုက် အသစ်ရောက်စာအုပ်များ</h2>
+                    <p className="text-xs text-muted-foreground">မကြာသေးမီက စာရင်းသွင်း ရောက်ရှိထားသော စာအုပ်များ</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {libraryBooks.slice(0, 6).map((b, i) => (
+                      <article key={b.id} className="overflow-hidden rounded-2xl border border-border bg-muted/20 hover:bg-muted/40 transition">
+                        <div className="flex items-center gap-2.5 p-3">
+                          <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/15 text-primary">
+                            <Library className="h-4 w-4" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold leading-tight">OCDI Library</p>
+                            <p className="text-[10px] text-muted-foreground">{i + 1} ရက်အလို · {b.category}</p>
+                          </div>
+                          <button onClick={() => toggleSave(b.id)}>
+                            <Bookmark
+                              className={`h-4 w-4 transition ${
+                                savedBooks[b.id] ? "fill-primary text-primary" : "text-muted-foreground"
+                              }`}
+                            />
+                          </button>
+                        </div>
+
+                        <div
+                          onClick={() => setSelectedBook(b)}
+                          className="flex cursor-pointer gap-3 p-3 pt-0"
+                        >
+                          <BookCover
+                            title={b.title}
+                            cover={b.cover}
+                            i={i + 3}
+                            className="aspect-[2/3] w-20 shrink-0 rounded-lg shadow"
+                          />
+                          <div className="flex min-w-0 flex-col justify-center gap-1">
+                            <span className="w-fit rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                              {b.category}
+                            </span>
+                            <p className="text-xs font-bold leading-snug">{b.title}</p>
+                            <p className="text-[11px] text-muted-foreground">{b.author}</p>
+                            <p className="text-[10px] text-muted-foreground">နေရာ - {b.shelf}</p>
+                            <span className="text-[10px] font-bold text-success">● ရရှိနိုင်သည် ({b.copies} အုပ်)</span>
+                          </div>
+                        </div>
+
+                        <div className="flex border-t border-border text-xs font-semibold text-muted-foreground">
+                          <button
+                            onClick={() => toggleLike(b.id)}
+                            className={`flex flex-1 items-center justify-center gap-1.5 py-2 hover:bg-muted transition ${
+                              likedBooks[b.id] ? "text-red-500" : ""
+                            }`}
+                          >
+                            <Heart className={`h-3.5 w-3.5 ${likedBooks[b.id] ? "fill-red-500" : ""}`} />
+                            <span>{likedBooks[b.id] ? "Like ပြုလုပ်ပြီး" : "Like"}</span>
+                          </button>
+                          <button
+                            onClick={() => setSelectedBook(b)}
+                            className="flex flex-1 items-center justify-center gap-1.5 py-2 hover:bg-muted"
+                          >
+                            <MessageCircle className="h-3.5 w-3.5" /> အသေးစိတ်
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              </>
+            )}
+
+            <footer className="pt-6 text-center text-xs text-muted-foreground">
+              © 2026 OCDI Library Management System · All Rights Reserved
+            </footer>
+          </main>
+        </div>
+      </div>
 
       {/* Floating AI Librarian Trigger */}
       <button
         onClick={() => setChat(true)}
-        className={`glass fixed right-3 z-30 flex items-center gap-2 rounded-full border border-border py-1.5 pl-1.5 pr-3 shadow-lg transition-all duration-300 bottom-[calc(64px+env(safe-area-inset-bottom))] ${
+        className={`glass fixed right-4 z-30 flex items-center gap-2 rounded-full border border-border py-2 pl-2 pr-3.5 shadow-xl transition-all duration-300 bottom-[calc(76px+env(safe-area-inset-bottom))] lg:bottom-6 ${
           hideFab || drawer || chat || selectedBook ? "pointer-events-none translate-y-28 opacity-0" : ""
         }`}
       >
@@ -624,8 +693,8 @@ function Index() {
         <span className="text-xs font-bold leading-relaxed">စာကြည့်တိုက်မှူးလေး</span>
       </button>
 
-      {/* Bottom Navigation */}
-      <nav className="glass pb-safe fixed inset-x-0 bottom-0 z-40 mx-auto max-w-lg border-t border-border">
+      {/* Mobile Bottom Navigation (Hidden on Desktop) */}
+      <nav className="lg:hidden glass pb-safe fixed inset-x-0 bottom-0 z-40 mx-auto max-w-lg border-t border-border">
         <div className="flex">
           {navTabs.map(({ id, icon: I, l }) => {
             const active = tab === id && id !== "menu";
@@ -633,7 +702,7 @@ function Index() {
               <button
                 key={id}
                 onClick={() => (id === "menu" ? setDrawer(true) : setTab(id))}
-                className={`relative flex flex-1 flex-col items-center gap-0.5 pt-2 text-[10px] font-semibold ${
+                className={`relative flex flex-1 flex-col items-center gap-0.5 pt-2 pb-1 text-[10px] font-semibold ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
               >
@@ -643,7 +712,7 @@ function Index() {
                     <I className="h-4 w-4" />
                   </span>
                 ) : (
-                  <I className="h-6 w-6" strokeWidth={active ? 2.4 : 1.8} />
+                  <I className="h-5 w-5" strokeWidth={active ? 2.4 : 1.8} />
                 )}
                 <span className="leading-relaxed">{l}</span>
               </button>
@@ -652,24 +721,24 @@ function Index() {
         </div>
       </nav>
 
-      {/* BOOK DETAILS MODAL */}
+      {/* BOOK DETAILS MODAL (Desktop & Mobile) */}
       {selectedBook && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 backdrop-blur-sm p-0 sm:p-4">
-          <div className="glass max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-3xl sm:rounded-3xl border border-border p-5 space-y-4 shadow-2xl animate-in slide-in-from-bottom">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="glass max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl border border-border p-5 sm:p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between pb-2 border-b border-border">
               <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                 {selectedBook.category}
               </span>
               <button
                 onClick={() => setSelectedBook(null)}
-                className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-secondary-foreground"
+                className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             <div className="flex gap-4">
-              <div className="w-32 shrink-0">
+              <div className="w-28 sm:w-36 shrink-0">
                 <BookCover
                   title={selectedBook.title}
                   cover={selectedBook.cover}
@@ -720,77 +789,11 @@ function Index() {
         </div>
       )}
 
-      {/* Side Drawer */}
-      <div className={`fixed inset-0 z-50 transition ${drawer ? "" : "pointer-events-none"}`}>
-        <div
-          onClick={() => setDrawer(false)}
-          className={`absolute inset-0 bg-background/60 backdrop-blur-sm transition-opacity ${
-            drawer ? "opacity-100" : "opacity-0"
-          }`}
-        />
-        <aside
-          className={`absolute inset-y-0 left-0 w-72 overflow-y-auto bg-sidebar p-4 shadow-xl transition-transform duration-300 ${
-            drawer ? "translate-x-0" : "-translate-x-full"
-          }`}
-        >
-          <div className="mb-4 flex items-center justify-between">
-            <span className="text-lg font-extrabold text-primary">OCDI Library</span>
-            <button
-              aria-label="Close"
-              onClick={() => setDrawer(false)}
-              className="grid h-8 w-8 place-items-center rounded-full bg-secondary"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          {[
-            [
-              "Primary",
-              [
-                [Home, "Home", () => setTab("home")],
-                [Gift, "Donate", () => setTab("donate")],
-                [BookOpen, "Books Catalog", () => setTab("books")],
-                [Newspaper, "Newspapers", () => setTab("pubs")],
-              ],
-            ],
-            [
-              "Categories",
-              [
-                [Cpu, "နည်းပညာ", () => { setActiveCategory("နည်းပညာ"); setTab("books"); }],
-                [Shield, "သမိုင်းနှင့် နိုင်ငံရေး", () => { setActiveCategory("သမိုင်း"); setTab("books"); }],
-                [BookMarked, "ရသစာပေ", () => { setActiveCategory("ရသစာပေ"); setTab("books"); }],
-              ],
-            ],
-          ].map(([g, items]) => (
-            <div key={g as string} className="mb-3">
-              <p className="px-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                {g as string}
-              </p>
-              {(items as [typeof Home, string, () => void][]).map(([I, l, action]) => (
-                <button
-                  key={l}
-                  onClick={() => {
-                    action();
-                    setDrawer(false);
-                  }}
-                  className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm font-medium hover:bg-sidebar-accent"
-                >
-                  <span className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-primary">
-                    <I className="h-4 w-4" />
-                  </span>
-                  {l}
-                </button>
-              ))}
-            </div>
-          ))}
-        </aside>
-      </div>
-
-      {/* AI Librarian Chat */}
+      {/* AI Librarian Chat Modal */}
       {chat && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-background/60 backdrop-blur-sm">
-          <div className="glass flex h-[78vh] w-full max-w-lg flex-col rounded-t-2xl border border-border">
-            <div className="flex items-center gap-2 border-b border-border p-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in">
+          <div className="glass flex h-[80vh] w-full max-w-lg flex-col rounded-3xl border border-border shadow-2xl overflow-hidden">
+            <div className="flex items-center gap-2 border-b border-border p-3.5">
               <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground">
                 <Sparkles className="h-4 w-4" />
               </span>
@@ -801,13 +804,13 @@ function Index() {
               <button
                 aria-label="Close chat"
                 onClick={() => setChat(false)}
-                className="grid h-8 w-8 place-items-center rounded-full bg-secondary"
+                className="grid h-8 w-8 place-items-center rounded-full bg-secondary hover:bg-secondary/80"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="flex-1 space-y-3 overflow-y-auto p-3">
+            <div className="flex-1 space-y-3 overflow-y-auto p-4">
               {msgs.map((m, i) => (
                 <div key={i} className="space-y-2">
                   <div
@@ -842,12 +845,12 @@ function Index() {
               ))}
             </div>
 
-            <div className="no-scrollbar flex gap-2 overflow-x-auto px-3 pb-2">
+            <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-2">
               {["နည်းပညာ", "နိုင်ဝင်းဆွေ", "မင်းလူ", "သမိုင်း", "IKIGAI", "သတင်းစာ"].map((s) => (
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="shrink-0 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+                  className="shrink-0 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary hover:bg-primary hover:text-primary-foreground transition"
                 >
                   {s}
                 </button>
@@ -859,7 +862,7 @@ function Index() {
                 e.preventDefault();
                 send(input);
               }}
-              className="pb-safe flex gap-2 border-t border-border p-3"
+              className="flex gap-2 border-t border-border p-3 bg-card/60"
             >
               <input
                 value={input}
